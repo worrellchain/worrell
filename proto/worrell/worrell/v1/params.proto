@@ -1,0 +1,13 @@
+syntax = "proto3";
+package worrell.worrell.v1;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/worrellchain/worrell/x/worrell/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "worrell/x/worrell/Params";
+  option (gogoproto.equal) = true;
+}
