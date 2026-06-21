@@ -1,9 +1,43 @@
+# Binarios y artefactos de build
+/build/
+release/
+worrelld
+*.exe
+*.test
+*.out
+
+# Dependencias
+vendor/
+node_modules/
 vue/node_modules
 vue/dist
-release/
+
+# Datos del nodo y claves (NUNCA subir)
+.worrell/
+*.key
+*.pem
+node_key.json
+priv_validator_key.json
+priv_validator_state.json
+keyring-*/
+mnemonic*.txt
+*.mnemonic
+
+# Variables de entorno y secretos
+.env
+.env.*
+*.secret
+
+# Editores y SO
 .idea/
 .vscode/
 .DS_Store
-*.dot
+
+# Logs y temporales
 *.log
+*.dot
 *.ign
+tmp/
+
+# La configuración de redes vive en su propio repositorio: worrellchain/networks
+networks/

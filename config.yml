@@ -1,27 +1,106 @@
+# Worrell — config de desarrollo local (perfil testnet)
+# Tiempos reducidos y faucet habilitado para pruebas rápidas con `ignite chain serve`.
+# El vesting de fundadores y los multisig NO se configuran aquí: se aplican en los
+# scripts de networks/ (setup-genesis.sh / setup-multisig.sh). En desarrollo local las
+# cuentas son claves simples, solo para que el supply total cuadre a 1.000.000.000 WORRELL.
 version: 1
 validation: sovereign
-default_denom: stake
-accounts: 
-- name: alice
+default_denom: uworrell
+
+accounts:
+- name: henry
   coins:
-  - 20000token
-  - 200000000stake
-- name: bob
+  - 100000000000000uworrell   # 100M WORRELL (fundador, validador inicial)
+- name: george
   coins:
-  - 10000token
-  - 100000000stake
+  - 50000000000000uworrell    # 50M WORRELL (fundador, fuente del faucet en testnet)
+- name: charlie
+  coins:
+  - 50000000000000uworrell    # 50M WORRELL (fundador)
+- name: treasury
+  coins:
+  - 300000000000000uworrell   # 300M WORRELL (multisig 3/3 en redes reales)
+- name: airdrop
+  coins:
+  - 225000000000000uworrell   # 225M WORRELL (multisig 2/4 en redes reales)
+- name: incentives
+  coins:
+  - 175000000000000uworrell   # 175M WORRELL (multisig 2/4 en redes reales)
+- name: reserve
+  coins:
+  - 100000000000000uworrell   # 100M WORRELL (multisig 2/4 en redes reales)
+
 client:
   openapi:
     path: docs/static/openapi.json
+
 faucet:
-  name: bob
+  name: george
   coins:
-  - 5token
-  - 100000stake
+  - 100000000uworrell         # 100 WORRELL por solicitud
+  host: 0.0.0.0:4500
+
 validators:
-- name: alice
-  bonded: 100000000stake
-- name: validator1
-  bonded: 200000000stake
-- name: validator2
-  bonded: 100000000stake
+- name: henry
+  bonded: 20000000000000uworrell   # 20M WORRELL self-delegados -> 80M líquidos tras gentx
+  app:
+    minimum-gas-prices: "0.025uworrell"
+  gentx:
+    moniker: henry
+    commission-rate: "0.05"             # 5% (§7)
+    commission-max-rate: "0.25"         # 25%
+    commission-max-change-rate: "0.01"  # 1% por día
+
+genesis:
+  chain_id: worrell-testnet-1
+  consensus:
+    params:
+      block:
+        max_gas: "40000000"        # block gas limit (§14)
+  app_state:
+    staking:
+      params:
+        bond_denom: uworrell
+        unbonding_time: "3600s"            # testnet: 1 hora (mainnet: 1814400s)
+        max_validators: 100
+        max_entries: 7
+        historical_entries: 10000
+        min_commission_rate: "0.050000000000000000"   # 5% global
+    mint:
+      minter:
+        inflation: "0.130000000000000000"  # inflación inicial 13%
+      params:
+        mint_denom: uworrell
+        inflation_rate_change: "0.130000000000000000"
+        inflation_max: "0.130000000000000000"          # 13%
+        inflation_min: "0.070000000000000000"          # 7%
+        goal_bonded: "0.670000000000000000"            # 67%
+        blocks_per_year: "6311520"
+    slashing:
+      params:
+        signed_blocks_window: "10000"
+        min_signed_per_window: "0.050000000000000000"  # 5%
+        downtime_jail_duration: "300s"                 # testnet: 5 min (mainnet: 43200s)
+        slash_fraction_double_sign: "0.050000000000000000"  # 5%
+        slash_fraction_downtime: "0.000100000000000000"     # 0.01%
+    distribution:
+      params:
+        community_tax: "0.100000000000000000"          # 10%
+    gov:
+      params:
+        min_deposit:
+        - denom: uworrell
+          amount: "1500000000"                          # 1.500 WORRELL
+        max_deposit_period: "600s"                      # testnet: 10 min (mainnet: 1209600s)
+        voting_period: "300s"                           # testnet: 5 min (mainnet: 432000s)
+        quorum: "0.334000000000000000"                  # 33.4%
+        threshold: "0.500000000000000000"               # 50%
+        veto_threshold: "0.334000000000000000"          # 33.4%
+        burn_vote_quorum: true
+        burn_proposal_deposit_prevote: false
+        burn_vote_veto: true
+        expedited_min_deposit:
+        - denom: uworrell
+          amount: "7500000000"                          # 7.500 WORRELL
+        expedited_voting_period: "120s"                 # testnet: 2 min (mainnet: 86400s)
+        expedited_threshold: "0.667000000000000000"     # 66.7%
