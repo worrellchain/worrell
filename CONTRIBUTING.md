@@ -1,55 +1,55 @@
-# Guía de contribución — Worrell
+# Contribution Guide — Worrell
 
-¡Gracias por tu interés en contribuir a Worrell! Esta guía describe el proceso para
-proponer cambios al proyecto.
+Thank you for your interest in contributing to Worrell! This guide describes the process for
+proposing changes to the project.
 
-## Código de conducta
+## Code of Conduct
 
-Esperamos un trato respetuoso y profesional entre todas las personas que participan.
-No se tolera el acoso ni el comportamiento abusivo. Al participar, aceptas mantener
-un entorno colaborativo y constructivo.
+We expect respectful and professional treatment among everyone who participates.
+Harassment and abusive behavior are not tolerated. By participating, you agree to maintain
+a collaborative and constructive environment.
 
-## Antes de empezar
+## Before You Start
 
-- Lee el [README](README.md) y la documentación en [`docs/`](docs/) para entender la
-  arquitectura, los parámetros de red y el modelo de gobernanza.
-- Para cambios grandes o que afecten a parámetros de consenso/economía, **abre primero
-  un issue** para discutir la propuesta. Muchos cambios de parámetros de la red en
-  producción se realizan vía gobernanza on-chain, no por PR (ver [docs/GOVERNANCE.md](docs/GOVERNANCE.md)).
+- Read the [README](README.md) and the documentation in [`docs/`](docs/) to understand the
+  architecture, network parameters, and governance model.
+- For large changes or those that affect consensus/economic parameters, **open an issue
+  first** to discuss the proposal. Many parameter changes to the network in
+  production are made via on-chain governance, not via PR (see [docs/GOVERNANCE.md](docs/GOVERNANCE.md)).
 
-## Flujo de trabajo
+## Workflow
 
-1. **Fork** del repositorio `github.com/worrellchain/worrell`.
-2. Crea una **rama** descriptiva a partir de la rama principal:
+1. **Fork** the `github.com/worrellchain/worrell` repository.
+2. Create a descriptive **branch** from the main branch:
    ```bash
-   git checkout -b feat/breve-descripcion
+   git checkout -b feat/short-description
    ```
-3. Realiza tus cambios con **commits** claros y atómicos. Usa mensajes en imperativo
-   (p. ej. `fix: corrige cálculo de inflación`, `docs: amplía guía de validadores`).
-   Se recomienda el estilo [Conventional Commits](https://www.conventionalcommits.org/).
-4. Asegúrate de que el proyecto **compila** y las comprobaciones pasan:
+3. Make your changes with clear, atomic **commits**. Use imperative messages
+   (e.g. `fix: correct inflation calculation`, `docs: expand validator guide`).
+   The [Conventional Commits](https://www.conventionalcommits.org/) style is recommended.
+4. Make sure the project **compiles** and the checks pass:
    ```bash
    ignite chain build
    go test ./...
    ```
-5. Abre un **Pull Request** contra la rama principal. Describe el qué y el porqué,
-   enlaza los issues relacionados e incluye pasos de prueba.
+5. Open a **Pull Request** against the main branch. Describe the what and the why,
+   link the related issues, and include testing steps.
 
-## Requisitos para los PR
+## PR Requirements
 
-- El código compila (`ignite chain build`) y los tests pasan (`go test ./...`).
-- Sigue el estilo del código existente (`gofmt`/`go vet` limpios).
-- Cambios de comportamiento acompañados de tests cuando sea posible.
-- Documentación actualizada si el cambio afecta a parámetros, comandos o flujos.
-- **No** incluyas claves privadas, mnemónicos, archivos `.env` ni datos de nodo en el PR.
+- The code compiles (`ignite chain build`) and the tests pass (`go test ./...`).
+- It follows the style of the existing code (clean `gofmt`/`go vet`).
+- Behavioral changes accompanied by tests whenever possible.
+- Documentation updated if the change affects parameters, commands, or flows.
+- Do **not** include private keys, mnemonics, `.env` files, or node data in the PR.
 
-## Seguridad
+## Security
 
-Si encuentras una vulnerabilidad, **no abras un issue público**. Repórtala de forma
-responsable a **security@worrellchain.io**. Consulta la sección de seguridad del
-[README](README.md#seguridad) para más detalles.
+If you find a vulnerability, **do not open a public issue**. Report it
+responsibly to **security@worrellchain.io**. See the security section of the
+[README](README.md#security) for more details.
 
-## Licencia
+## License
 
-Al contribuir, aceptas que tus aportaciones se publiquen bajo la licencia
-[Apache 2.0](LICENSE) del proyecto.
+By contributing, you agree that your contributions are released under the project's
+[Apache 2.0](LICENSE) license.
