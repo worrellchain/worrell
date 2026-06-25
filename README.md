@@ -2,39 +2,39 @@
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/worrellchain/worrell/blob/main/LICENSE)
 
-**Worrell** es una blockchain proof-of-stake (PoS) construida con [Ignite CLI](https://ignite.com/) y [Cosmos SDK](https://docs.cosmos.network/), enfocada en **pagos e infraestructura energética**.
+**Worrell** is a proof-of-stake (PoS) blockchain built with [Ignite CLI](https://ignite.com/) and [Cosmos SDK](https://docs.cosmos.network/), focused on **payments and energy infrastructure**.
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
 | Token | WORRELL |
-| Denominación base | uworrell |
-| Decimales | 6 (1 WORRELL = 1.000.000 uworrell) |
-| Binario | `worrelld` |
+| Base denomination | uworrell |
+| Decimals | 6 (1 WORRELL = 1,000,000 uworrell) |
+| Binary | `worrelld` |
 | Data directory | `~/.worrell/` |
-| Address prefix | `worrell` (direcciones `worrell1...`) |
-| Chain ID mainnet | `worrell-1` |
-| Chain ID testnet | `worrell-testnet-1` |
-| Licencia | Apache 2.0 |
+| Address prefix | `worrell` (addresses `worrell1...`) |
+| Mainnet chain ID | `worrell-1` |
+| Testnet chain ID | `worrell-testnet-1` |
+| License | Apache 2.0 |
 
 ---
 
-## Características principales
+## Key features
 
-- **Consenso Proof-of-Stake** sobre CometBFT, con tiempos de bloque de ~5-6 segundos.
-- **Enfoque en pagos e infraestructura energética** como casos de uso prioritarios.
-- **Gobernanza on-chain** con propuestas estándar y expedited (urgentes).
-- **Staking y delegación** con hasta 100 validadores activos.
-- **Inflación dinámica** ligada al ratio de tokens en staking (objetivo 67%).
-- **Vesting de fundadores** lineal y continuo, con cuentas multisig para la tesorería y las reservas de la comunidad.
-- **IBC instalado** (desactivado en genesis, se habilitará por gobernanza cuando la red sea estable).
+- **Proof-of-Stake consensus** over CometBFT, with block times of ~5-6 seconds.
+- **Focus on payments and energy infrastructure** as priority use cases.
+- **On-chain governance** with standard and expedited (urgent) proposals.
+- **Staking and delegation** with up to 100 active validators.
+- **Dynamic inflation** tied to the staking ratio (target 67%).
+- **Linear, continuous founder vesting**, with multisig accounts for the treasury and community reserves.
+- **IBC installed** (disabled at genesis, to be enabled via governance once the network is stable).
 
 ---
 
 ## Token economics
 
-**Supply total: 1.000.000.000 WORRELL** (1.000.000.000.000.000 uworrell).
+**Total supply: 1,000,000,000 WORRELL** (1,000,000,000,000,000 uworrell).
 
-Distribución genesis:
+Genesis distribution:
 
 ```
 treasury    30.0%  ██████████████████████████████
@@ -46,26 +46,26 @@ george       5.0%  █████
 charlie      5.0%  █████
 ```
 
-| Cuenta | WORRELL | % | uworrell | Custodia |
+| Account | WORRELL | % | uworrell | Custody |
 |--------|--------:|--:|---------:|----------|
-| treasury | 300.000.000 | 30,0% | 300000000000000 | Multisig 3/3 |
-| airdrop | 225.000.000 | 22,5% | 225000000000000 | Multisig 2/4 |
-| incentives | 175.000.000 | 17,5% | 175000000000000 | Multisig 2/4 |
-| henry | 100.000.000 | 10,0% | 100000000000000 | Vesting 4 años, cliff 1 año |
-| reserve | 100.000.000 | 10,0% | 100000000000000 | Multisig 2/4 |
-| george | 50.000.000 | 5,0% | 50000000000000 | Vesting 4 años, cliff 1 año |
-| charlie | 50.000.000 | 5,0% | 50000000000000 | Vesting 4 años, cliff 1 año |
-| **TOTAL** | **1.000.000.000** | **100%** | **1000000000000000** | |
+| treasury | 300,000,000 | 30.0% | 300000000000000 | Multisig 3/3 |
+| airdrop | 225,000,000 | 22.5% | 225000000000000 | Multisig 2/4 |
+| incentives | 175,000,000 | 17.5% | 175000000000000 | Multisig 2/4 |
+| henry | 100,000,000 | 10.0% | 100000000000000 | Vesting 4 years, cliff 1 year |
+| reserve | 100,000,000 | 10.0% | 100000000000000 | Multisig 2/4 |
+| george | 50,000,000 | 5.0% | 50000000000000 | Vesting 4 years, cliff 1 year |
+| charlie | 50,000,000 | 5.0% | 50000000000000 | Vesting 4 years, cliff 1 year |
+| **TOTAL** | **1,000,000,000** | **100%** | **1000000000000000** | |
 
-**Resumen:** Fundadores 20% · Comunidad 80%.
+**Summary:** Founders 20% · Community 80%.
 
-Para el detalle completo de distribución, vesting y multisig consulta [docs/TOKENOMICS.md](docs/TOKENOMICS.md).
+For the full breakdown of distribution, vesting and multisig, see [docs/TOKENOMICS.md](docs/TOKENOMICS.md).
 
 ---
 
 ## Quick start
 
-Requisitos: Go 1.22+ e Ignite CLI v29.9.0 (Cosmos SDK v0.53.6).
+Requirements: Go 1.22+ and Ignite CLI v29.9.0 (Cosmos SDK v0.53.6).
 
 ### Build
 
@@ -75,7 +75,7 @@ cd worrell
 ignite chain build
 ```
 
-Esto genera el binario `worrelld`.
+This generates the `worrelld` binary.
 
 ### Init
 
@@ -83,137 +83,137 @@ Esto genera el binario `worrelld`.
 worrelld init <moniker> --chain-id worrell-1
 ```
 
-El estado del nodo se almacena en `~/.worrell/`.
+Node state is stored in `~/.worrell/`.
 
 ### Join testnet
 
 ```bash
-# Inicializa el nodo para la testnet
+# Initialize the node for the testnet
 worrelld init <moniker> --chain-id worrell-testnet-1
 
-# Descarga el genesis de la testnet, configura los peers y arranca:
+# Download the testnet genesis, configure peers and start:
 worrelld start
 ```
 
-Guía completa para operar un nodo y crear un validador: [docs/RUNNING-A-NODE.md](docs/RUNNING-A-NODE.md).
+Full guide to operating a node and creating a validator: [docs/RUNNING-A-NODE.md](docs/RUNNING-A-NODE.md).
 
 ---
 
-## Parámetros de red
+## Network parameters
 
-| Parámetro | Valor |
+| Parameter | Value |
 |-----------|-------|
-| Block time | ~5-6 segundos |
-| Block gas limit | 40.000.000 |
+| Block time | ~5-6 seconds |
+| Block gas limit | 40,000,000 |
 | Min gas price | 0.025 uworrell |
 | Pruning | Default |
-| State Sync | Habilitado |
-| Telemetría | Prometheus habilitado |
+| State Sync | Enabled |
+| Telemetry | Prometheus enabled |
 
-### Puertos
+### Ports
 
-| Servicio | Puerto |
+| Service | Port |
 |----------|-------:|
 | CometBFT P2P | 26656 |
 | CometBFT RPC | 26657 |
-| API REST | 1317 |
+| REST API | 1317 |
 | gRPC | 9090 |
 | Prometheus | 26660 |
-| Faucet (solo testnet) | 4500 |
+| Faucet (testnet only) | 4500 |
 
 ---
 
-## Gobernanza
+## Governance
 
-Worrell soporta propuestas **estándar** y **expedited** (urgentes). Ambas comparten el mismo quórum del **33,4%**.
+Worrell supports **standard** and **expedited** (urgent) proposals. Both share the same quorum of **33.4%**.
 
-| Parámetro | Estándar | Expedited |
+| Parameter | Standard | Expedited |
 |-----------|----------|-----------|
-| Depósito mínimo | 1.500.000.000 uworrell (1.500 WORRELL) | 7.500.000.000 uworrell (7.500 WORRELL) |
-| Periodo de depósito | 1.209.600 s (14 días) | 1.209.600 s (14 días) |
-| Periodo de votación | 432.000 s (5 días) | 86.400 s (24 horas) |
-| Quórum | 33,4% (0.334) | 33,4% (0.334) |
-| Threshold | 50% (0.50) | 66,7% (0.667) |
-| Veto threshold | 33,4% (0.334) | 33,4% (0.334) |
-| Burn en veto | true | true |
-| Burn sin quórum | true | true |
+| Minimum deposit | 1,500,000,000 uworrell (1,500 WORRELL) | 7,500,000,000 uworrell (7,500 WORRELL) |
+| Deposit period | 1,209,600 s (14 days) | 1,209,600 s (14 days) |
+| Voting period | 432,000 s (5 days) | 86,400 s (24 hours) |
+| Quorum | 33.4% (0.334) | 33.4% (0.334) |
+| Threshold | 50% (0.50) | 66.7% (0.667) |
+| Veto threshold | 33.4% (0.334) | 33.4% (0.334) |
+| Burn on veto | true | true |
+| Burn without quorum | true | true |
 
-> Nota: el módulo `gov` de Cosmos SDK no expone un parámetro `expedited_quorum`; las propuestas expedited usan el mismo quórum que las estándar.
+> Note: the Cosmos SDK `gov` module does not expose an `expedited_quorum` parameter; expedited proposals use the same quorum as standard ones.
 
-Detalle completo: [docs/GOVERNANCE.md](docs/GOVERNANCE.md).
+Full detail: [docs/GOVERNANCE.md](docs/GOVERNANCE.md).
 
 ---
 
-## Módulos
+## Modules
 
-| Módulo | Estado | Configuración |
+| Module | Status | Configuration |
 |--------|--------|---------------|
-| Bank | Activo | Transferencias habilitadas |
-| Staking | Activo | Ver sección de staking |
-| Governance | Activo | Estándar + expedited |
-| Distribution | Activo | Community tax 10% |
-| Slashing | Activo | Ver sección de slashing |
-| Mint | Activo | Inflación dinámica 7%-13% |
-| Authz | Activo | Módulo estándar habilitado |
-| Fee Grants | Activo | Módulo estándar habilitado |
-| Upgrade | Activo | Vía propuestas de gobernanza |
-| IBC | Instalado · desactivado en genesis | `send_enabled: false`, `receive_enabled: false` |
-| CosmWasm | No instalado | Se integrará post-lanzamiento vía chain upgrade |
-| Crisis | No incluido | Deprecado en Cosmos SDK v0.53.6 |
+| Bank | Active | Transfers enabled |
+| Staking | Active | See staking section |
+| Governance | Active | Standard + expedited |
+| Distribution | Active | Community tax 10% |
+| Slashing | Active | See slashing section |
+| Mint | Active | Dynamic inflation 7%-13% |
+| Authz | Active | Standard module enabled |
+| Fee Grants | Active | Standard module enabled |
+| Upgrade | Active | Via governance proposals |
+| IBC | Installed · disabled at genesis | `send_enabled: false`, `receive_enabled: false` |
+| CosmWasm | Not installed | To be integrated post-launch via chain upgrade |
+| Crisis | Not included | Deprecated in Cosmos SDK v0.53.6 |
 
 ---
 
 ## Staking
 
-| Parámetro | Mainnet | Testnet |
+| Parameter | Mainnet | Testnet |
 |-----------|---------|---------|
-| Max validadores | 100 | 100 |
-| Min self-delegation | 1.000.000 uworrell (1 WORRELL) | 1.000.000 uworrell (1 WORRELL) |
-| Comisión mínima | 5% (0.05) | 5% (0.05) |
-| Unbonding period | 1.814.400 s (21 días) | 3.600 s (1 hora) |
+| Max validators | 100 | 100 |
+| Min self-delegation | 1,000,000 uworrell (1 WORRELL) | 1,000,000 uworrell (1 WORRELL) |
+| Minimum commission | 5% (0.05) | 5% (0.05) |
+| Unbonding period | 1,814,400 s (21 days) | 3,600 s (1 hour) |
 | Max entries | 7 | 7 |
-| Historical entries | 10.000 | 10.000 |
+| Historical entries | 10,000 | 10,000 |
 | Bond denom | uworrell | uworrell |
 
-> La comisión mínima del 5% es global. Cada validador define su propio máximo de comisión.
+> The 5% minimum commission is global. Each validator sets its own maximum commission.
 
 ---
 
 ## Slashing
 
-| Evento | Penalización | Efecto adicional (mainnet) |
+| Event | Penalty | Additional effect (mainnet) |
 |--------|--------------|----------------------------|
-| Downtime | 0,01% (0.0001) | Jail 43.200 s (12 horas) |
+| Downtime | 0.01% (0.0001) | Jail 43,200 s (12 hours) |
 | Double sign | 5% (0.05) | — |
 
-| Parámetro | Mainnet | Testnet |
+| Parameter | Mainnet | Testnet |
 |-----------|---------|---------|
-| Signed blocks window | 10.000 bloques | 10.000 bloques |
+| Signed blocks window | 10,000 blocks | 10,000 blocks |
 | Min signed per window | 5% (0.05) | 5% (0.05) |
-| Downtime jail duration | 43.200 s (12 horas) | 300 s (5 min) |
+| Downtime jail duration | 43,200 s (12 hours) | 300 s (5 min) |
 
 ---
 
-## Documentación
+## Documentation
 
-- [docs/TOKENOMICS.md](docs/TOKENOMICS.md) — Distribución genesis, vesting, multisig, inflación y fees.
-- [docs/GOVERNANCE.md](docs/GOVERNANCE.md) — Cómo funciona la gobernanza, tipos de propuesta y comandos.
-- [docs/RUNNING-A-NODE.md](docs/RUNNING-A-NODE.md) — Requisitos, instalación, operación y creación de validador.
-
----
-
-## Seguridad
-
-Si encuentras una vulnerabilidad, repórtala de forma responsable y privada a **security@worrellchain.io**. Por favor, no abras issues públicas para problemas de seguridad.
+- [docs/TOKENOMICS.md](docs/TOKENOMICS.md) — Genesis distribution, vesting, multisig, inflation and fees.
+- [docs/GOVERNANCE.md](docs/GOVERNANCE.md) — How governance works, proposal types and commands.
+- [docs/RUNNING-A-NODE.md](docs/RUNNING-A-NODE.md) — Requirements, installation, operation and validator creation.
 
 ---
 
-## Contribuir
+## Security
 
-Las contribuciones son bienvenidas. Revisa la guía [CONTRIBUTING.md](CONTRIBUTING.md) antes de abrir un pull request.
+If you find a vulnerability, please report it responsibly and privately to **security@worrellchain.io**. Please do not open public issues for security problems.
 
 ---
 
-## Licencia
+## Contributing
 
-Distribuido bajo la licencia [Apache 2.0](https://github.com/worrellchain/worrell/blob/main/LICENSE).
+Contributions are welcome. Please review the [CONTRIBUTING.md](CONTRIBUTING.md) guide before opening a pull request.
+
+---
+
+## License
+
+Distributed under the [Apache 2.0](https://github.com/worrellchain/worrell/blob/main/LICENSE) license.
