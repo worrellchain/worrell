@@ -1,41 +1,41 @@
-# Tokenomics de Worrell
+# Worrell Tokenomics
 
-Este documento describe la economía del token **WORRELL**: el supply total, la
-distribución de génesis, el calendario de vesting de los fundadores, la
-configuración multisig de las cuentas custodiadas, la política de tesorería, la
-inflación y los fees de transacción.
+This document describes the economics of the **WORRELL** token: the total supply,
+the genesis distribution, the founders' vesting schedule, the multisig
+configuration of the custodied accounts, the treasury policy, inflation, and
+transaction fees.
 
-## Token y unidades
+## Token and units
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
 | Token | WORRELL |
-| Denominación base | uworrell |
-| Decimales | 6 |
-| Conversión | 1 WORRELL = 1.000.000 uworrell |
-| Supply total | 1.000.000.000 WORRELL (1.000.000.000.000.000 uworrell) |
+| Base denomination | uworrell |
+| Decimals | 6 |
+| Conversion | 1 WORRELL = 1.000.000 uworrell |
+| Total supply | 1.000.000.000 WORRELL (1.000.000.000.000.000 uworrell) |
 
 ---
 
-## 1. Distribución de génesis
+## 1. Genesis distribution
 
-El supply total es de **1.000.000.000 WORRELL** y se reparte en 7 cuentas de
-génesis. Los fundadores reciben en conjunto el 20 % y la comunidad el 80 %.
+The total supply is **1.000.000.000 WORRELL** and is split across 7 genesis
+accounts. The founders receive 20 % combined and the community 80 %.
 
-| Cuenta | WORRELL | % | uworrell | Custodia |
+| Account | WORRELL | % | uworrell | Custody |
 |--------|--------:|---:|---------:|----------|
-| henry | 100.000.000 | 10 % | 100000000000000 | Vesting 4 años, cliff 1 año |
-| george | 50.000.000 | 5 % | 50000000000000 | Vesting 4 años, cliff 1 año |
-| charlie | 50.000.000 | 5 % | 50000000000000 | Vesting 4 años, cliff 1 año |
+| henry | 100.000.000 | 10 % | 100000000000000 | Vesting 4 years, cliff 1 year |
+| george | 50.000.000 | 5 % | 50000000000000 | Vesting 4 years, cliff 1 year |
+| charlie | 50.000.000 | 5 % | 50000000000000 | Vesting 4 years, cliff 1 year |
 | treasury | 300.000.000 | 30 % | 300000000000000 | Multisig 3/3 |
 | airdrop | 225.000.000 | 22,5 % | 225000000000000 | Multisig 2/4 |
 | incentives | 175.000.000 | 17,5 % | 175000000000000 | Multisig 2/4 |
 | reserve | 100.000.000 | 10 % | 100000000000000 | Multisig 2/4 |
 | **TOTAL** | **1.000.000.000** | **100 %** | **1000000000000000** | |
 
-**Resumen:** Fundadores 20 % | Comunidad 80 %
+**Summary:** Founders 20 % | Community 80 %
 
-### Distribución visual
+### Visual distribution
 
 ```
 treasury    30.0%  ███████████████  300M
@@ -51,151 +51,149 @@ charlie      5.0%  ██▌               50M
 
 ---
 
-## 2. Fundadores y roles
+## 2. Founders and roles
 
-Las etiquetas `henry`, `george` y `charlie` identifican cuentas de génesis y no
-representan personas concretas.
+The labels `henry`, `george`, and `charlie` identify genesis accounts and do not
+represent specific individuals.
 
-| Cuenta | Asignación | Rol |
+| Account | Allocation | Role |
 |--------|-----------:|-----|
-| henry | 100.000.000 WORRELL | Fundador y validador inicial de la red |
-| george | 50.000.000 WORRELL | Fundador y fuente del faucet en testnet |
-| charlie | 50.000.000 WORRELL | Fundador |
+| henry | 100.000.000 WORRELL | Founder and initial network validator |
+| george | 50.000.000 WORRELL | Founder and faucet source on testnet |
+| charlie | 50.000.000 WORRELL | Founder |
 
-Las tres cuentas de fundadores están sujetas al mismo esquema de vesting:
-4 años de duración con un cliff de 1 año.
+All three founder accounts are subject to the same vesting scheme:
+4 years in duration with a 1-year cliff.
 
 ---
 
-## 3. Vesting de fundadores
+## 3. Founder vesting
 
-Las asignaciones de los tres fundadores se entregan mediante una cuenta de tipo
-**`ContinuousVestingAccount`**.
+The allocations of the three founders are delivered through a
+**`ContinuousVestingAccount`** type account.
 
-> **Importante:** la liberación es **lineal y continua**. No existen tramos
-> anuales ni desbloqueos por bloques discretos. Una vez superado el cliff, cada
-> instante de tiempo libera una fracción proporcional de los tokens.
+> **Important:** the release is **linear and continuous**. There are no annual
+> tranches or unlocks at discrete blocks. Once the cliff has passed, every
+> instant of time releases a proportional fraction of the tokens.
 
-### Parámetros del vesting
+### Vesting parameters
 
-| Parámetro | Valor |
+| Parameter | Value |
 |-----------|-------|
-| Tipo de cuenta | ContinuousVestingAccount |
-| `start_time` | timestamp de génesis + 31.557.600 s (1 año) |
-| `end_time` | timestamp de génesis + 126.230.400 s (4 años) |
-| Año 0–1 (cliff) | 0 liberado: nada transferible |
-| Año 1–4 | Liberación lineal continua durante 3 años |
+| Account type | ContinuousVestingAccount |
+| `start_time` | genesis timestamp + 31.557.600 s (1 year) |
+| `end_time` | genesis timestamp + 126.230.400 s (4 years) |
+| Year 0–1 (cliff) | 0 released: nothing transferable |
+| Year 1–4 | Linear, continuous release over 3 years |
 
-El `start_time` situado un año después del génesis implementa el **cliff**:
-durante el primer año no se libera absolutamente nada. A partir de ese momento, y
-hasta el `end_time` (4 años desde el génesis), los tokens se liberan de forma
-lineal y continua a lo largo de los 3 años restantes.
+The `start_time` set one year after genesis implements the **cliff**: during the
+first year absolutely nothing is released. From that moment onward, and up to the
+`end_time` (4 years from genesis), the tokens are released in a linear and
+continuous manner over the remaining 3 years.
 
-### Calendario de liberación — henry (100M)
+### Release schedule — henry (100M)
 
-La liberación es continua; los puntos de la tabla son cortes de referencia para
-ilustrar el ritmo lineal a lo largo del tramo de vesting.
+The release is continuous; the points in the table are reference cuts to
+illustrate the linear pace across the vesting span.
 
-| Momento | Liberado en el intervalo | Acumulado |
+| Moment | Released in the interval | Cumulative |
 |---------|-------------------------:|----------:|
-| 0–12 meses | 0 | 0 |
-| 18 meses | ~16.666.667 | ~16.666.667 |
-| 24 meses | ~16.666.667 | ~33.333.333 |
-| 30 meses | ~16.666.667 | ~50.000.000 |
-| 36 meses | ~16.666.667 | ~66.666.667 |
-| 42 meses | ~16.666.667 | ~83.333.333 |
-| 48 meses | ~16.666.667 | 100.000.000 |
+| 0–12 months | 0 | 0 |
+| 18 months | ~16.666.667 | ~16.666.667 |
+| 24 months | ~16.666.667 | ~33.333.333 |
+| 30 months | ~16.666.667 | ~50.000.000 |
+| 36 months | ~16.666.667 | ~66.666.667 |
+| 42 months | ~16.666.667 | ~83.333.333 |
+| 48 months | ~16.666.667 | 100.000.000 |
 
-### Calendario de liberación — george y charlie (50M cada uno)
+### Release schedule — george and charlie (50M each)
 
-| Momento | Acumulado |
+| Moment | Cumulative |
 |---------|----------:|
-| 0–12 meses | 0 |
-| 24 meses | ~16.666.667 |
-| 36 meses | ~33.333.333 |
-| 48 meses | 50.000.000 |
+| 0–12 months | 0 |
+| 24 months | ~16.666.667 |
+| 36 months | ~33.333.333 |
+| 48 months | 50.000.000 |
 
-### Reglas del vesting
+### Vesting rules
 
-- Los tokens en vesting **NO se pueden transferir** hasta que se liberen.
-- Los tokens en vesting **SÍ se pueden usar para staking** (delegar).
-- Los tokens en vesting **SÍ cuentan para votar** en gobernanza.
-- Las recompensas de staking son **completamente LÍQUIDAS** y no están sujetas a
-  vesting.
+- Vesting tokens **CANNOT be transferred** until they are released.
+- Vesting tokens **CAN be used for staking** (delegating).
+- Vesting tokens **DO count for voting** in governance.
+- Staking rewards are **fully LIQUID** and are not subject to vesting.
 
 ---
 
-## 4. Multisig de cuentas custodiadas
+## 4. Multisig of custodied accounts
 
-Las cuatro cuentas de la comunidad (treasury, airdrop, incentives, reserve) están
-controladas por direcciones multisig.
+The four community accounts (treasury, airdrop, incentives, reserve) are
+controlled by multisig addresses.
 
-| Cuenta | Tipo | Firmantes | Firmas necesarias |
+| Account | Type | Signers | Required signatures |
 |--------|------|-----------|-------------------|
-| treasury | 3 de 3 | henry, george, charlie | Las 3 (unanimidad) |
-| airdrop | 2 de 4 | henry, george, charlie, airdrop-aux | 2 de los 3 fundadores |
-| incentives | 2 de 4 | henry, george, charlie, incentives-aux | 2 de los 3 fundadores |
-| reserve | 2 de 4 | henry, george, charlie, reserve-aux | 2 de los 3 fundadores |
+| treasury | 3 of 3 | henry, george, charlie | All 3 (unanimity) |
+| airdrop | 2 of 4 | henry, george, charlie, airdrop-aux | 2 of the 3 founders |
+| incentives | 2 of 4 | henry, george, charlie, incentives-aux | 2 of the 3 founders |
+| reserve | 2 of 4 | henry, george, charlie, reserve-aux | 2 of the 3 founders |
 
-> **Nota sobre las claves auxiliares.** Las claves `airdrop-aux`,
-> `incentives-aux` y `reserve-aux` existen **únicamente** para generar una
-> dirección multisig distinta a la de treasury. **No participan en la firma real**:
-> en la práctica, cada una de esas cuentas se opera con la firma de 2 de los 3
-> fundadores.
+> **Note on the auxiliary keys.** The keys `airdrop-aux`, `incentives-aux`, and
+> `reserve-aux` exist **solely** to generate a multisig address distinct from
+> treasury's. **They do not take part in the actual signing**: in practice, each
+> of those accounts is operated with the signature of 2 of the 3 founders.
 
 ---
 
-## 5. Política de tesorería
+## 5. Treasury policy
 
-Distribución orientativa (no técnica) de los 300.000.000 WORRELL custodiados en la
-cuenta `treasury`.
+Indicative (non-technical) distribution of the 300.000.000 WORRELL custodied in
+the `treasury` account.
 
-| Partida | % de treasury | WORRELL |
+| Item | % of treasury | WORRELL |
 |---------|--------------:|--------:|
-| Desarrollo | 25 % | 75.000.000 |
-| Liquidez | 20 % | 60.000.000 |
+| Development | 25 % | 75.000.000 |
+| Liquidity | 20 % | 60.000.000 |
 | Grants | 15 % | 45.000.000 |
 | Partnerships | 15 % | 45.000.000 |
 | Marketing | 15 % | 45.000.000 |
-| Contingencias | 10 % | 30.000.000 |
+| Contingencies | 10 % | 30.000.000 |
 | **TOTAL** | **100 %** | **300.000.000** |
 
 ---
 
-## 6. Inflación y recompensas
+## 6. Inflation and rewards
 
-El módulo de mint emite nuevos tokens en función del porcentaje del supply que esté
-en staking, ajustando la inflación dinámicamente.
+The mint module issues new tokens based on the percentage of the supply that is
+staked, dynamically adjusting inflation.
 
-| Parámetro | Valor |
+| Parameter | Value |
 |-----------|-------|
-| Inflación mínima | 7 % |
-| Inflación máxima | 13 % |
-| Inflación inicial | 13 % |
+| Minimum inflation | 7 % |
+| Maximum inflation | 13 % |
+| Initial inflation | 13 % |
 | Goal bonded ratio | 67 % |
 | Mint denom | uworrell |
 
-Cuando menos del 67 % del supply está en staking, la inflación sube hacia el 13 %;
-cuando hay más, baja hacia el 7 %.
+When less than 67 % of the supply is staked, inflation rises toward 13 %; when
+more is staked, it falls toward 7 %.
 
-### Distribución de recompensas
+### Reward distribution
 
-| Destino | % de las recompensas |
+| Destination | % of rewards |
 |---------|---------------------:|
-| Validadores y delegadores | 90 % |
+| Validators and delegators | 90 % |
 | Community pool (community tax) | 10 % |
 
-El community tax es del **10 %**: ese porcentaje de las recompensas de staking se
-deriva al community pool y el **90 %** restante se reparte entre validadores y
-delegadores.
+The community tax is **10 %**: that percentage of staking rewards is routed to
+the community pool, and the remaining **90 %** is split between validators and
+delegators.
 
 ---
 
-## 7. Fees de transacción
+## 7. Transaction fees
 
-| Parámetro | Valor |
+| Parameter | Value |
 |-----------|-------|
 | Min gas price | 0,025 uworrell |
 
-Cada nodo aplica un precio mínimo de gas de **0,025 uworrell**. Las transacciones
-que ofrezcan un precio inferior serán rechazadas por el mempool.
+Each node applies a minimum gas price of **0,025 uworrell**. Transactions that
+offer a lower price will be rejected by the mempool.

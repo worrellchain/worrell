@@ -1,192 +1,188 @@
-# Gobernanza de Worrell
+# Worrell Governance
 
-Worrell es una blockchain proof-of-stake construida con Cosmos SDK. La toma de
-decisiones de la red se realiza on-chain mediante el módulo de gobernanza
-(`x/gov`): cualquier titular de tokens puede proponer cambios y la comunidad de
-stakers los aprueba o rechaza votando.
+Worrell is a proof-of-stake blockchain built with Cosmos SDK. Network
+decision-making happens on-chain through the governance module (`x/gov`): any
+token holder can propose changes, and the staker community approves or rejects
+them by voting.
 
-Este documento describe cómo funciona el ciclo de una propuesta, los parámetros
-exactos de la red, las reglas de depósito, las opciones de voto y los comandos
-de CLI necesarios para participar.
+This document describes how a proposal's lifecycle works, the exact network
+parameters, the deposit rules, the voting options, and the CLI commands needed
+to participate.
 
 - Token: **WORRELL**
-- Denominación base: **uworrell** (1 WORRELL = 1,000,000 uworrell)
-- Binario: **worrelld**
-- Prefijo de direcciones: **worrell1...**
+- Base denomination: **uworrell** (1 WORRELL = 1,000,000 uworrell)
+- Binary: **worrelld**
+- Address prefix: **worrell1...**
 
 ---
 
-## 1. Cómo funciona la gobernanza
+## 1. How governance works
 
-Toda propuesta atraviesa cuatro fases secuenciales:
+Every proposal goes through four sequential phases:
 
 ```
   submit  ──▶  deposit  ──▶  vote  ──▶  outcome
- (enviar)     (depósito)    (votar)    (resultado)
 ```
 
-1. **Submit (envío).** Un usuario envía la propuesta a la cadena. En el momento
-   del envío puede adjuntar un depósito inicial (parcial o total). La propuesta
-   queda registrada con un identificador (`proposal-id`).
+1. **Submit.** A user submits the proposal to the chain. At submission time they
+   can attach an initial deposit (partial or full). The proposal is recorded
+   with an identifier (`proposal-id`).
 
-2. **Deposit (periodo de depósito).** La propuesta debe alcanzar el **depósito
-   mínimo** antes de que termine el periodo de depósito. Cualquier cuenta puede
-   contribuir al depósito de una propuesta, no solo quien la creó.
-   - Si se alcanza el depósito mínimo dentro del plazo, la propuesta pasa
-     automáticamente a votación.
-   - Si **no** se alcanza el depósito mínimo dentro del plazo, la propuesta
-     caduca y los depósitos se devuelven (no se queman, porque
-     `burn_proposal_deposit_prevote` es `false`).
+2. **Deposit (deposit period).** The proposal must reach the **minimum deposit**
+   before the deposit period ends. Any account can contribute to a proposal's
+   deposit, not just its creator.
+   - If the minimum deposit is reached within the time limit, the proposal
+     automatically moves to voting.
+   - If the minimum deposit is **not** reached within the time limit, the
+     proposal expires and the deposits are returned (not burned, because
+     `burn_proposal_deposit_prevote` is `false`).
 
-3. **Vote (periodo de votación).** Comienza cuando se cubre el depósito mínimo.
-   Durante este periodo, los stakers votan con una de cuatro opciones: `Yes`,
-   `No`, `NoWithVeto`, `Abstain`. El peso de cada voto es proporcional a los
-   tokens en staking (los tokens en vesting también cuentan para votar).
+3. **Vote (voting period).** Begins once the minimum deposit is covered. During
+   this period, stakers vote with one of four options: `Yes`, `No`,
+   `NoWithVeto`, `Abstain`. The weight of each vote is proportional to staked
+   tokens (vesting tokens also count for voting).
 
-4. **Outcome (resultado).** Al terminar la votación, el resultado se calcula a
-   partir del **quórum**, el **threshold** y el **veto threshold**:
-   - Para que el resultado sea válido, la participación debe alcanzar el
-     **quórum**.
-   - Si se alcanza el quórum y los votos `Yes` superan el **threshold** (sin
-     superar el umbral de veto), la propuesta se **aprueba** y, en su caso, se
-     ejecuta automáticamente.
-   - En cualquier otro caso, la propuesta se **rechaza**.
+4. **Outcome.** When voting ends, the result is computed from the **quorum**,
+   the **threshold**, and the **veto threshold**:
+   - For the result to be valid, participation must reach the **quorum**.
+   - If the quorum is reached and `Yes` votes exceed the **threshold** (without
+     exceeding the veto threshold), the proposal is **approved** and, where
+     applicable, executed automatically.
+   - In any other case, the proposal is **rejected**.
 
-Las reglas concretas de devolución o quema del depósito según el resultado se
-detallan en la sección [4. Reglas de depósito](#4-reglas-de-depósito).
+The specific rules for returning or burning the deposit depending on the outcome
+are detailed in section [4. Deposit rules](#4-deposit-rules).
 
 ---
 
-## 2. Propuestas estándar
+## 2. Standard proposals
 
-Parámetros del módulo de gobernanza para propuestas estándar. La columna
-**Testnet** indica los valores reducidos usados en `worrell-testnet-1` para
-poder probar el ciclo completo en minutos en lugar de días.
+Governance module parameters for standard proposals. The **Testnet** column
+shows the reduced values used in `worrell-testnet-1` so the full cycle can be
+tested in minutes instead of days.
 
-| Parámetro | Valor mainnet | Valor testnet |
+| Parameter | Mainnet value | Testnet value |
 |-----------|---------------|---------------|
-| Depósito mínimo | **1,500,000,000 uworrell** (1,500 WORRELL) | Igual (1,500,000,000 uworrell) |
-| Periodo de depósito | 1,209,600s (14 días) | 600s (10 min) |
-| Periodo de votación | 432,000s (5 días) | 300s (5 min) |
-| Quórum | 33.4% (0.334) | Igual |
-| Threshold | 50% (0.50) | Igual |
-| Veto threshold | 33.4% (0.334) | Igual |
-| Burn en veto | `true` | `true` |
-| Burn sin quórum | `true` | `true` |
-| Burn antes de votación | `false` (se devuelve) | `false` |
+| Minimum deposit | **1,500,000,000 uworrell** (1,500 WORRELL) | Same (1,500,000,000 uworrell) |
+| Deposit period | 1,209,600s (14 days) | 600s (10 min) |
+| Voting period | 432,000s (5 days) | 300s (5 min) |
+| Quorum | 33.4% (0.334) | Same |
+| Threshold | 50% (0.50) | Same |
+| Veto threshold | 33.4% (0.334) | Same |
+| Burn on veto | `true` | `true` |
+| Burn without quorum | `true` | `true` |
+| Burn before voting | `false` (returned) | `false` |
 
 ---
 
-## 3. Propuestas expedited (urgentes)
+## 3. Expedited proposals (urgent)
 
-Las propuestas **expedited** permiten resolver asuntos urgentes con un periodo
-de votación más corto, a cambio de un depósito mínimo mayor y un threshold de
-aprobación más exigente.
+**Expedited** proposals allow urgent matters to be resolved with a shorter
+voting period, in exchange for a higher minimum deposit and a more demanding
+approval threshold.
 
-| Parámetro | Valor mainnet | Valor testnet |
+| Parameter | Mainnet value | Testnet value |
 |-----------|---------------|---------------|
-| Depósito mínimo | **7,500,000,000 uworrell** (7,500 WORRELL) | Igual (7,500,000,000 uworrell) |
-| Periodo de votación | 86,400s (24 horas) | 120s (2 min) |
-| Threshold | 66.7% (0.667) | Igual |
-| Quórum | **33.4% (0.334) — el mismo que las estándar** | Igual |
+| Minimum deposit | **7,500,000,000 uworrell** (7,500 WORRELL) | Same (7,500,000,000 uworrell) |
+| Voting period | 86,400s (24 hours) | 120s (2 min) |
+| Threshold | 66.7% (0.667) | Same |
+| Quorum | **33.4% (0.334) — the same as standard ones** | Same |
 
-> ### ⚠️ IMPORTANTE: no existe `expedited_quorum`
+> ### ⚠️ IMPORTANT: there is no `expedited_quorum`
 >
-> Las propuestas expedited usan **exactamente el mismo quórum que las
-> estándar: 33.4% (0.334)**.
+> Expedited proposals use **exactly the same quorum as standard ones:
+> 33.4% (0.334)**.
 >
-> El módulo `x/gov` de Cosmos SDK **NO** tiene un parámetro
-> `expedited_quorum`. Lo que el módulo permite ajustar de forma independiente
-> para las expedited es únicamente el **depósito mínimo**, el **periodo de
-> votación** y el **threshold**. El quórum es un parámetro global compartido por
-> ambos tipos de propuesta.
+> The Cosmos SDK `x/gov` module does **NOT** have an `expedited_quorum`
+> parameter. What the module allows to be configured independently for expedited
+> proposals is only the **minimum deposit**, the **voting period**, and the
+> **threshold**. The quorum is a global parameter shared by both proposal types.
 >
-> No intentes configurar un quórum distinto para las expedited: ese parámetro no
-> existe. Cualquier propuesta (estándar o expedited) que no alcance el 33.4% de
-> participación no superará el quórum.
+> Do not attempt to configure a different quorum for expedited proposals: that
+> parameter does not exist. Any proposal (standard or expedited) that does not
+> reach 33.4% participation will not pass the quorum.
 
 ---
 
-## 4. Opciones de voto
+## 4. Voting options
 
-Cada votante elige una de estas cuatro opciones:
+Each voter chooses one of these four options:
 
-| Opción | Significado | Cuenta para quórum |
-|--------|-------------|--------------------|
-| `Yes` | A favor de la propuesta | Sí |
-| `No` | En contra de la propuesta | Sí |
-| `NoWithVeto` | En contra **y** considera la propuesta abusiva o spam; cuenta para el umbral de veto | Sí |
-| `Abstain` | Sin posición; suma a la participación pero no a favor ni en contra | Sí |
+| Option | Meaning | Counts toward quorum |
+|--------|---------|----------------------|
+| `Yes` | In favor of the proposal | Yes |
+| `No` | Against the proposal | Yes |
+| `NoWithVeto` | Against **and** considers the proposal abusive or spam; counts toward the veto threshold | Yes |
+| `Abstain` | No position; adds to participation but neither for nor against | Yes |
 
-Notas:
+Notes:
 
-- `Abstain` **cuenta para el quórum** (participación) aunque no exprese una
-  posición a favor o en contra.
-- `NoWithVeto` es un voto especialmente fuerte: si la suma de `NoWithVeto`
-  supera el **veto threshold (33.4%)** de los votos emitidos, la propuesta se
-  rechaza por veto **y su depósito se quema** (ver sección 5), aunque los `Yes`
-  hubieran superado el threshold.
+- `Abstain` **counts toward the quorum** (participation) even though it expresses
+  no position for or against.
+- `NoWithVeto` is an especially strong vote: if the sum of `NoWithVeto` exceeds
+  the **veto threshold (33.4%)** of the votes cast, the proposal is rejected by
+  veto **and its deposit is burned** (see section 5), even if the `Yes` votes
+  had exceeded the threshold.
 
 ---
 
-## 5. Reglas de depósito
+## 5. Deposit rules
 
-El destino del depósito depende del resultado de la propuesta. Worrell usa esta
-configuración:
+The fate of the deposit depends on the proposal's outcome. Worrell uses this
+configuration:
 
-| Parámetro | Valor | Efecto |
+| Parameter | Value | Effect |
 |-----------|-------|--------|
-| `burn_vote_quorum` | `true` | **Se quema** el depósito si la votación **no alcanza el quórum** (33.4%) |
-| `burn_proposal_deposit_prevote` | `false` | **NO se quema** el depósito si la propuesta no llega a votación (deposit period expirado): se **devuelve** |
-| Burn en veto (`NoWithVeto` supera el umbral) | `true` | **Se quema** el depósito |
+| `burn_vote_quorum` | `true` | The deposit **is burned** if the vote **does not reach the quorum** (33.4%) |
+| `burn_proposal_deposit_prevote` | `false` | The deposit is **NOT burned** if the proposal does not reach voting (deposit period expired): it is **returned** |
+| Burn on veto (`NoWithVeto` exceeds the threshold) | `true` | The deposit **is burned** |
 
-Resumen del destino del depósito según el escenario:
+Summary of the deposit's fate by scenario:
 
-| Escenario | Destino del depósito |
-|-----------|----------------------|
-| Propuesta **aprobada** | Se **devuelve** a los depositantes |
-| Propuesta **rechazada de forma normal** (gana `No`, sin veto) | Se **devuelve** a los depositantes |
-| Propuesta **vetada** (`NoWithVeto` supera el umbral del 33.4%) | Se **QUEMA** |
-| Votación **sin quórum** (`burn_vote_quorum: true`) | Se **QUEMA** |
-| Depósito mínimo **no alcanzado** dentro del periodo de depósito (`burn_proposal_deposit_prevote: false`) | Se **devuelve** (no se quema antes de votación) |
+| Scenario | Deposit's fate |
+|----------|----------------|
+| Proposal **approved** | **Returned** to depositors |
+| Proposal **rejected normally** (`No` wins, no veto) | **Returned** to depositors |
+| Proposal **vetoed** (`NoWithVeto` exceeds the 33.4% threshold) | **BURNED** |
+| Vote **without quorum** (`burn_vote_quorum: true`) | **BURNED** |
+| Minimum deposit **not reached** within the deposit period (`burn_proposal_deposit_prevote: false`) | **Returned** (not burned before voting) |
 
-Puntos clave:
+Key points:
 
-- El depósito se **devuelve** en un rechazo normal (la propuesta perdió, pero no
-  fue vetada y sí hubo quórum).
-- El depósito se **quema** en dos casos: (1) cuando hay **veto** porque
-  `NoWithVeto` supera su umbral, y (2) cuando **no se alcanza el quórum**, porque
-  `burn_vote_quorum` está en `true`.
-- El depósito **no se quema antes de la votación**: si la propuesta nunca llega a
-  votarse por falta de depósito mínimo, los fondos se devuelven
+- The deposit is **returned** in a normal rejection (the proposal lost, but was
+  not vetoed and there was a quorum).
+- The deposit is **burned** in two cases: (1) when there is a **veto** because
+  `NoWithVeto` exceeds its threshold, and (2) when the **quorum is not reached**,
+  because `burn_vote_quorum` is set to `true`.
+- The deposit is **not burned before voting**: if the proposal never reaches a
+  vote due to lack of minimum deposit, the funds are returned
   (`burn_proposal_deposit_prevote: false`).
 
 ---
 
-## 6. Tipos de propuestas
+## 6. Proposal types
 
-El módulo de gobernanza de Worrell admite los siguientes tipos de propuesta:
+Worrell's governance module supports the following proposal types:
 
-| Tipo | Descripción |
+| Type | Description |
 |------|-------------|
-| **Parameter change** | Modifica parámetros on-chain de un módulo (staking, slashing, mint, distribution, gov, etc.). |
-| **Software upgrade** | Programa una actualización coordinada del binario `worrelld` a una altura de bloque concreta (módulo `upgrade`). |
-| **Community pool spend** | Gasta fondos del community pool (alimentado por el 10% de community tax) hacia una dirección destino. |
-| **Text** | Propuesta de señalización sin efecto on-chain automático; sirve para medir el sentir de la comunidad. |
+| **Parameter change** | Modifies on-chain parameters of a module (staking, slashing, mint, distribution, gov, etc.). |
+| **Software upgrade** | Schedules a coordinated upgrade of the `worrelld` binary at a specific block height (`upgrade` module). |
+| **Community pool spend** | Spends funds from the community pool (fed by the 10% community tax) to a destination address. |
+| **Text** | Signaling proposal with no automatic on-chain effect; used to gauge community sentiment. |
 
-> En Cosmos SDK v0.50+ / v0.53, estos tipos se expresan habitualmente como
-> mensajes (`MsgUpdateParams`, `MsgSoftwareUpgrade`,
-> `MsgCommunityPoolSpend`, etc.) dentro de una propuesta genérica
-> (`submit-proposal` con un archivo JSON). Una propuesta de tipo **text** es una
-> propuesta sin mensajes que la ejecuten.
+> In Cosmos SDK v0.50+ / v0.53, these types are usually expressed as messages
+> (`MsgUpdateParams`, `MsgSoftwareUpgrade`, `MsgCommunityPoolSpend`, etc.) within
+> a generic proposal (`submit-proposal` with a JSON file). A **text** proposal is
+> a proposal with no messages to execute it.
 
 ---
 
-## 7. Ejemplo de propuesta en JSON
+## 7. Example proposal in JSON
 
-Ejemplo de archivo `proposal.json` para una propuesta de cambio de parámetro.
-Incluye un **depósito inicial de `1500000000uworrell`** (el depósito mínimo
-estándar de 1,500 WORRELL):
+Example `proposal.json` file for a parameter change proposal. It includes an
+**initial deposit of `1500000000uworrell`** (the standard minimum deposit of
+1,500 WORRELL):
 
 ```json
 {
@@ -206,33 +202,32 @@ estándar de 1,500 WORRELL):
   ],
   "metadata": "ipfs://CID",
   "deposit": "1500000000uworrell",
-  "title": "Ajuste de parámetros de staking",
-  "summary": "Propuesta de ejemplo que actualiza los parámetros del módulo de staking.",
+  "title": "Staking parameter adjustment",
+  "summary": "Example proposal that updates the staking module parameters.",
   "expedited": false
 }
 ```
 
-Notas sobre el JSON:
+Notes about the JSON:
 
-- El campo `deposit` usa la denominación base: `"1500000000uworrell"`
-  (= 1,500 WORRELL), que cubre el depósito mínimo estándar.
-- El campo `authority` es la cuenta del módulo de gobernanza (la dirección del
-  módulo `gov`); la propuesta solo puede ejecutarse a través de gobernanza.
-- Para una propuesta **expedited**, cambia `"expedited": true` y recuerda que el
-  depósito mínimo es de `7500000000uworrell` (7,500 WORRELL).
-- Una propuesta de tipo **text** lleva `"messages": []` (sin mensajes a
-  ejecutar).
+- The `deposit` field uses the base denomination: `"1500000000uworrell"`
+  (= 1,500 WORRELL), which covers the standard minimum deposit.
+- The `authority` field is the governance module account (the `gov` module
+  address); the proposal can only be executed through governance.
+- For an **expedited** proposal, change `"expedited": true` and remember that the
+  minimum deposit is `7500000000uworrell` (7,500 WORRELL).
+- A **text** proposal carries `"messages": []` (no messages to execute).
 
 ---
 
-## 8. Comandos de CLI
+## 8. CLI commands
 
-Todos los comandos usan el binario **`worrelld`**, la denominación base
-**`uworrell`** y direcciones con prefijo **`worrell1...`**.
+All commands use the **`worrelld`** binary, the **`uworrell`** base denomination,
+and addresses with the **`worrell1...`** prefix.
 
-### 8.1 Enviar una propuesta (submit)
+### 8.1 Submit a proposal
 
-A partir de un archivo `proposal.json` como el de la sección anterior:
+From a `proposal.json` file like the one in the previous section:
 
 ```bash
 worrelld tx gov submit-proposal proposal.json \
@@ -244,8 +239,8 @@ worrelld tx gov submit-proposal proposal.json \
   --yes
 ```
 
-Para enviar un depósito adicional a una propuesta existente durante el periodo
-de depósito:
+To submit an additional deposit to an existing proposal during the deposit
+period:
 
 ```bash
 worrelld tx gov deposit 1 1500000000uworrell \
@@ -255,34 +250,34 @@ worrelld tx gov deposit 1 1500000000uworrell \
   --yes
 ```
 
-> `1` es el `proposal-id`. En testnet usa `--chain-id worrell-testnet-1`.
+> `1` is the `proposal-id`. On testnet use `--chain-id worrell-testnet-1`.
 
-### 8.2 Consultar propuestas (query)
+### 8.2 Query proposals
 
 ```bash
-# Listar todas las propuestas
+# List all proposals
 worrelld query gov proposals
 
-# Ver una propuesta concreta (proposal-id = 1)
+# View a specific proposal (proposal-id = 1)
 worrelld query gov proposal 1
 
-# Ver el resultado de la votación
+# View the vote tally
 worrelld query gov tally 1
 
-# Ver los depósitos de una propuesta
+# View a proposal's deposits
 worrelld query gov deposits 1
 
-# Ver el voto de una cuenta concreta
+# View a specific account's vote
 worrelld query gov vote 1 worrell1tuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-# Ver los parámetros de gobernanza vigentes
+# View the current governance parameters
 worrelld query gov params
 ```
 
-### 8.3 Votar (vote)
+### 8.3 Vote
 
-Durante el periodo de votación, con una de las opciones `yes`, `no`,
-`no_with_veto` o `abstain`:
+During the voting period, with one of the options `yes`, `no`, `no_with_veto`,
+or `abstain`:
 
 ```bash
 worrelld tx gov vote 1 yes \
@@ -292,16 +287,16 @@ worrelld tx gov vote 1 yes \
   --yes
 ```
 
-Ejemplos de las cuatro opciones de voto:
+Examples of the four voting options:
 
 ```bash
-worrelld tx gov vote 1 yes          --from <cuenta> --chain-id worrell-1 --gas-prices 0.025uworrell --yes
-worrelld tx gov vote 1 no           --from <cuenta> --chain-id worrell-1 --gas-prices 0.025uworrell --yes
-worrelld tx gov vote 1 no_with_veto --from <cuenta> --chain-id worrell-1 --gas-prices 0.025uworrell --yes
-worrelld tx gov vote 1 abstain      --from <cuenta> --chain-id worrell-1 --gas-prices 0.025uworrell --yes
+worrelld tx gov vote 1 yes          --from <account> --chain-id worrell-1 --gas-prices 0.025uworrell --yes
+worrelld tx gov vote 1 no           --from <account> --chain-id worrell-1 --gas-prices 0.025uworrell --yes
+worrelld tx gov vote 1 no_with_veto --from <account> --chain-id worrell-1 --gas-prices 0.025uworrell --yes
+worrelld tx gov vote 1 abstain      --from <account> --chain-id worrell-1 --gas-prices 0.025uworrell --yes
 ```
 
-Voto ponderado (weighted vote), para repartir el peso entre varias opciones:
+Weighted vote, to split the weight across several options:
 
 ```bash
 worrelld tx gov weighted-vote 1 yes=0.7,abstain=0.3 \
@@ -313,14 +308,14 @@ worrelld tx gov weighted-vote 1 yes=0.7,abstain=0.3 \
 
 ---
 
-## 9. Resumen rápido
+## 9. Quick summary
 
-- **Ciclo:** submit → deposit → vote → outcome.
-- **Depósito mínimo estándar:** 1,500 WORRELL (`1500000000uworrell`).
+- **Cycle:** submit → deposit → vote → outcome.
+- **Standard minimum deposit:** 1,500 WORRELL (`1500000000uworrell`).
   **Expedited:** 7,500 WORRELL (`7500000000uworrell`).
-- **Quórum:** 33.4% para **ambos** tipos. **No existe `expedited_quorum`.**
-- **Threshold:** 50% estándar, 66.7% expedited. **Veto:** 33.4%.
-- **Depósito:** se devuelve en aprobación y en rechazo normal; se **quema** con
-  veto y por falta de quórum; no se quema antes de votación.
-- **Opciones de voto:** `Yes`, `No`, `NoWithVeto`, `Abstain`.
-- **Tipos:** parameter change, software upgrade, community pool spend, text.
+- **Quorum:** 33.4% for **both** types. **There is no `expedited_quorum`.**
+- **Threshold:** 50% standard, 66.7% expedited. **Veto:** 33.4%.
+- **Deposit:** returned on approval and on normal rejection; **burned** on veto
+  and on lack of quorum; not burned before voting.
+- **Voting options:** `Yes`, `No`, `NoWithVeto`, `Abstain`.
+- **Types:** parameter change, software upgrade, community pool spend, text.
