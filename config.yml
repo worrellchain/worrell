@@ -1,8 +1,8 @@
-# Worrell — config de desarrollo local (perfil testnet)
-# Tiempos reducidos y faucet habilitado para pruebas rápidas con `ignite chain serve`.
-# El vesting de fundadores y los multisig NO se configuran aquí: se aplican en los
-# scripts de networks/ (setup-genesis.sh / setup-multisig.sh). En desarrollo local las
-# cuentas son claves simples, solo para que el supply total cuadre a 1.000.000.000 WORRELL.
+# Worrell — local development config (testnet profile)
+# Reduced timings and faucet enabled for quick testing with `ignite chain serve`.
+# Founder vesting and multisigs are NOT configured here: they are applied in the
+# networks/ scripts (setup-genesis.sh / setup-multisig.sh). In local development the
+# accounts are simple keys, only so the total supply adds up to 1,000,000,000 WORRELL.
 version: 1
 validation: sovereign
 default_denom: uworrell
@@ -10,25 +10,25 @@ default_denom: uworrell
 accounts:
 - name: henry
   coins:
-  - 100000000000000uworrell   # 100M WORRELL (fundador, validador inicial)
+  - 100000000000000uworrell   # 100M WORRELL (founder, initial validator)
 - name: george
   coins:
-  - 50000000000000uworrell    # 50M WORRELL (fundador, fuente del faucet en testnet)
+  - 50000000000000uworrell    # 50M WORRELL (founder, faucet source on testnet)
 - name: charlie
   coins:
-  - 50000000000000uworrell    # 50M WORRELL (fundador)
+  - 50000000000000uworrell    # 50M WORRELL (founder)
 - name: treasury
   coins:
-  - 300000000000000uworrell   # 300M WORRELL (multisig 3/3 en redes reales)
+  - 300000000000000uworrell   # 300M WORRELL (3/3 multisig on real networks)
 - name: airdrop
   coins:
-  - 225000000000000uworrell   # 225M WORRELL (multisig 2/4 en redes reales)
+  - 225000000000000uworrell   # 225M WORRELL (2/4 multisig on real networks)
 - name: incentives
   coins:
-  - 175000000000000uworrell   # 175M WORRELL (multisig 2/4 en redes reales)
+  - 175000000000000uworrell   # 175M WORRELL (2/4 multisig on real networks)
 - name: reserve
   coins:
-  - 100000000000000uworrell   # 100M WORRELL (multisig 2/4 en redes reales)
+  - 100000000000000uworrell   # 100M WORRELL (2/4 multisig on real networks)
 
 client:
   openapi:
@@ -37,19 +37,19 @@ client:
 faucet:
   name: george
   coins:
-  - 100000000uworrell         # 100 WORRELL por solicitud
+  - 100000000uworrell         # 100 WORRELL per request
   host: 0.0.0.0:4500
 
 validators:
 - name: henry
-  bonded: 20000000000000uworrell   # 20M WORRELL self-delegados -> 80M líquidos tras gentx
+  bonded: 20000000000000uworrell   # 20M WORRELL self-delegated -> 80M liquid after gentx
   app:
     minimum-gas-prices: "0.025uworrell"
   gentx:
     moniker: henry
     commission-rate: "0.05"             # 5% (§7)
     commission-max-rate: "0.25"         # 25%
-    commission-max-change-rate: "0.01"  # 1% por día
+    commission-max-change-rate: "0.01"  # 1% per day
 
 genesis:
   chain_id: worrell-testnet-1
@@ -61,14 +61,14 @@ genesis:
     staking:
       params:
         bond_denom: uworrell
-        unbonding_time: "3600s"            # testnet: 1 hora (mainnet: 1814400s)
+        unbonding_time: "3600s"            # testnet: 1 hour (mainnet: 1814400s)
         max_validators: 100
         max_entries: 7
         historical_entries: 10000
         min_commission_rate: "0.050000000000000000"   # 5% global
     mint:
       minter:
-        inflation: "0.130000000000000000"  # inflación inicial 13%
+        inflation: "0.130000000000000000"  # initial inflation 13%
       params:
         mint_denom: uworrell
         inflation_rate_change: "0.130000000000000000"
@@ -90,7 +90,7 @@ genesis:
       params:
         min_deposit:
         - denom: uworrell
-          amount: "1500000000"                          # 1.500 WORRELL
+          amount: "1500000000"                          # 1,500 WORRELL
         max_deposit_period: "600s"                      # testnet: 10 min (mainnet: 1209600s)
         voting_period: "300s"                           # testnet: 5 min (mainnet: 432000s)
         quorum: "0.334000000000000000"                  # 33.4%
@@ -101,6 +101,6 @@ genesis:
         burn_vote_veto: true
         expedited_min_deposit:
         - denom: uworrell
-          amount: "7500000000"                          # 7.500 WORRELL
+          amount: "7500000000"                          # 7,500 WORRELL
         expedited_voting_period: "120s"                 # testnet: 2 min (mainnet: 86400s)
         expedited_threshold: "0.667000000000000000"     # 66.7%
