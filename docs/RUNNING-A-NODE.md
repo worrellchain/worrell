@@ -110,22 +110,33 @@ This creates the data directory at `~/.worrell` with the following relevant stru
 
 ### 4.1 Get the genesis
 
-Replace the locally generated genesis with the network's official genesis:
+Replace the locally generated genesis with the network's official genesis, published in
+[worrellchain/networks](https://github.com/worrellchain/networks):
 
 ```bash
-curl -s https://raw.githubusercontent.com/worrellchain/worrell/main/networks/testnet/genesis.json \
+curl -s https://raw.githubusercontent.com/worrellchain/networks/main/worrell-testnet-1/genesis.json \
   -o ~/.worrell/config/genesis.json
 worrelld genesis validate-genesis
 ```
 
+Verify that you have the exact official file by checking its sha256 against the one
+published in the [networks README](https://github.com/worrellchain/networks#join-the-testnet):
+
+```bash
+shasum -a 256 ~/.worrell/config/genesis.json
+# expected: a81c507b12ba0678c3172394ff4bb03e1c3db60050cc5568c127a24ec19378fd
+```
+
 ### 4.2 Configure peers and seeds
 
-Edit `~/.worrell/config/config.toml` and set `seeds` and `persistent_peers` in the `[p2p]` section with the nodes published for the testnet (format `<node_id>@<host>:26656`):
+Edit `~/.worrell/config/config.toml` and set `persistent_peers` in the `[p2p]` section
+(format `<node_id>@<host>:26656`). The up-to-date peer list is published in
+[`worrell-testnet-1/chain.json`](https://github.com/worrellchain/networks/blob/main/worrell-testnet-1/chain.json)
+(`peers` section). Current bootstrap peer:
 
 ```toml
 # ~/.worrell/config/config.toml  -> [p2p]
-seeds = "<seed_node_id>@<seed_host>:26656"
-persistent_peers = "<peer_node_id_1>@<peer_host_1>:26656,<peer_node_id_2>@<peer_host_2>:26656"
+persistent_peers = "bb9164c1bd9ed9ff2c0fd9e09b23285698e231de@164.68.98.186:26656"
 ```
 
 ### 4.3 Set the minimum gas price
@@ -181,7 +192,13 @@ When `catching_up` is `false`, the node is up to date. The network has **State S
 
 ## 5. Create a validator
 
-> You need: a synchronized node (`catching_up: false`) and an account with sufficient WORRELL balance. On testnet you can request funds from the faucet.
+> You need: a synchronized node (`catching_up: false`) and an account with sufficient WORRELL balance. On testnet you can request funds from the faucet (100 WORRELL per request, rate-limited to once per hour per address):
+>
+> ```bash
+> curl -X POST http://164.68.98.186:4500 \
+>   -H "Content-Type: application/json" \
+>   -d '{"address":"worrell1YOURADDRESS..."}'
+> ```
 
 ### 5.1 Create or import a key
 
