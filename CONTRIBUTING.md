@@ -46,7 +46,7 @@ a collaborative and constructive environment.
 ## Security
 
 If you find a vulnerability, **do not open a public issue**. Report it
-responsibly to **security@worrellchain.io**. See the security section of the
+responsibly to **security@worrellchain.com**. See the security section of the
 [README](README.md#security) for more details.
 
 ## License

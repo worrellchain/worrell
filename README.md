@@ -204,7 +204,7 @@ Full detail: [docs/GOVERNANCE.md](docs/GOVERNANCE.md).
 
 ## Security
 
-If you find a vulnerability, please report it responsibly and privately to **security@worrellchain.io**. Please do not open public issues for security problems.
+If you find a vulnerability, please report it responsibly and privately to **security@worrellchain.com**. Please do not open public issues for security problems.
 
 ---
 
