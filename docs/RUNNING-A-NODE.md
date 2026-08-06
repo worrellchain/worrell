@@ -192,7 +192,7 @@ When `catching_up` is `false`, the node is up to date. The network has **State S
 
 ## 5. Create a validator
 
-> You need: a synchronized node (`catching_up: false`) and an account with sufficient WORRELL balance. On testnet you can request funds from the faucet (100 WORRELL per request, rate-limited to once per hour per address):
+> You need: a synchronized node (`catching_up: false`) and an account with sufficient WORRELL balance. On testnet you can request funds from the faucet (500 WORRELL per request, rate-limited to once per hour per address):
 >
 > ```bash
 > curl -X POST http://164.68.98.186:4500 \
