@@ -40,6 +40,28 @@ jobs:
           DO_NOT_TRACK: 1
           GOFLAGS: "-buildvcs=false"
 
+      # Ignite's release tarballs bury the binary under an internal tmp/ path.
+      # Repackage each one so `tar -xzf` yields `worrelld` at the top level,
+      # then regenerate the checksum file for the new tarballs.
+      - name: Repackage tarballs with a clean layout
+        if: ${{ steps.vars.outputs.should_release == 'true' }}
+        run: |
+          set -euo pipefail
+          cd release
+          for f in *.tar.gz; do
+            dir=$(mktemp -d)
+            tar -xzf "$f" -C "$dir"
+            bin=$(find "$dir" -type f -name worrelld | head -1)
+            chmod +x "$bin"
+            tar -czf "$f.new" -C "$(dirname "$bin")" worrelld
+            mv "$f.new" "$f"
+            rm -rf "$dir"
+          done
+          sha256sum *.tar.gz > release_checksum
+          echo "--- clean layout check ---"
+          for f in *.tar.gz; do echo "$f:"; tar -tzf "$f"; done
+          cat release_checksum
+
       - name: Publish the Release
         uses: softprops/action-gh-release@v1
         if: ${{ steps.vars.outputs.should_release == 'true' }}
