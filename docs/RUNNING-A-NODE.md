@@ -44,10 +44,38 @@ For a mainnet validator more headroom is recommended, since the node must sign b
 
 ## 2. Installation
 
-### Dependencies
+There are two ways to get the `worrelld` binary. Option A is faster and requires no
+build tools; Option B lets you build (and audit) the binary yourself.
 
-- **Go 1.22+**
-- **git**, **make**, **build-essential**
+### Option A — Prebuilt binary (recommended)
+
+Download the tarball for your platform from the
+[releases page](https://github.com/worrellchain/worrell/releases) (use the latest version):
+
+| Your machine (`uname -s` / `uname -m`) | Tarball |
+|---|---|
+| `Linux` / `x86_64` | `vX.Y.Z_linux_amd64.tar.gz` |
+| `Linux` / `aarch64` | `vX.Y.Z_linux_arm64.tar.gz` |
+| `Darwin` / `arm64` (Apple Silicon Mac) | `vX.Y.Z_darwin_arm64.tar.gz` |
+| `Darwin` / `x86_64` (Intel Mac) | `vX.Y.Z_darwin_amd64.tar.gz` |
+
+Verify the download against the `release_checksum` file published with the release,
+then extract and install (the tarball contains the `worrelld` binary at the top level):
+
+```bash
+sha256sum vX.Y.Z_linux_amd64.tar.gz     # compare with release_checksum
+tar -xzf vX.Y.Z_linux_amd64.tar.gz
+mkdir -p ~/bin && mv worrelld ~/bin/
+echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
+export PATH="$HOME/bin:$PATH"
+```
+
+The binary is statically linked and self-contained — no Go toolchain or other
+dependencies are required.
+
+### Option B — Build from source
+
+Dependencies: **Go 1.22+**, **git**, **make**, **build-essential**.
 
 Installing dependencies on Ubuntu 22.04:
 
@@ -65,24 +93,21 @@ source ~/.profile
 go version
 ```
 
-### Build from source
+Clone and build, checking out the release tag so you build exactly the published version:
 
 ```bash
 git clone https://github.com/worrellchain/worrell.git
 cd worrell
+git checkout vX.Y.Z      # latest release tag
 make install
 ```
 
-`make install` compiles the `worrelld` binary and places it in `$HOME/go/bin`. Alternatively, you can build it with Ignite CLI:
+`make install` compiles the `worrelld` binary and places it in `$HOME/go/bin`.
+
+### Verify the installation (both options)
 
 ```bash
-ignite chain build
-```
-
-Verify the installation:
-
-```bash
-worrelld version
+worrelld version --long | head -5    # should report cosmos_sdk_version: v0.53.6
 worrelld --help
 ```
 
