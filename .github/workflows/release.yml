@@ -5,9 +5,9 @@
 #   git tag v0.1.0
 #   git push --tags
 #
-# It cross-compiles the node for linux/amd64, darwin/amd64 and darwin/arm64
-# and attaches the tarballs to a GitHub (pre)release for that tag. Review the
-# generated release page and publish it when ready.
+# It cross-compiles the node for linux/amd64, linux/arm64, darwin/amd64 and
+# darwin/arm64 and attaches the tarballs to a GitHub (pre)release for that tag.
+# Review the generated release page and publish it when ready.
 name: Release
 
 on:
@@ -35,7 +35,7 @@ jobs:
         uses: ignite/cli/actions/cli@main
         if: ${{ steps.vars.outputs.should_release == 'true' }}
         with:
-          args: chain build --release --release.prefix ${{ steps.vars.outputs.tarball_prefix }} -t linux:amd64 -t darwin:amd64 -t darwin:arm64 -y
+          args: chain build --release --release.prefix ${{ steps.vars.outputs.tarball_prefix }} -t linux:amd64 -t linux:arm64 -t darwin:amd64 -t darwin:arm64 -y
         env:
           DO_NOT_TRACK: 1
           GOFLAGS: "-buildvcs=false"
