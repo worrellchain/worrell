@@ -65,7 +65,7 @@ For the full breakdown of distribution, vesting and multisig, see [docs/TOKENOMI
 
 ## Quick start
 
-Requirements: Go 1.22+ and Ignite CLI v29.9.0 (Cosmos SDK v0.53.6).
+Requirements: Go 1.25+ and Ignite CLI v29.9.0 (Cosmos SDK v0.53.6).
 
 ### Build
 

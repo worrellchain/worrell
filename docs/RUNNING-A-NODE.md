@@ -75,7 +75,7 @@ dependencies are required.
 
 ### Option B — Build from source
 
-Dependencies: **Go 1.22+**, **git**, **make**, **build-essential**.
+Dependencies: **Go 1.25+** (see `go.mod` for the exact minimum), **git**, **make**, **build-essential**.
 
 Installing dependencies on Ubuntu 22.04:
 
@@ -83,11 +83,11 @@ Installing dependencies on Ubuntu 22.04:
 sudo apt update && sudo apt install -y git curl build-essential
 ```
 
-Installing Go (example with Go 1.22):
+Installing Go (example with Go 1.25):
 
 ```bash
-curl -LO https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
-sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
+curl -LO https://go.dev/dl/go1.25.13.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.25.13.linux-amd64.tar.gz
 echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> ~/.profile
 source ~/.profile
 go version
@@ -411,7 +411,7 @@ By default, the REST API and gRPC listen only on localhost. If you expose them p
 
 ## 8. Quick checklist
 
-- [ ] Go 1.22+ installed and `worrelld version` works
+- [ ] Go 1.25+ installed and `worrelld version` works
 - [ ] Node initialized with `--chain-id worrell-testnet-1`
 - [ ] Official `genesis.json` placed and validated
 - [ ] `seeds` / `persistent_peers` configured
