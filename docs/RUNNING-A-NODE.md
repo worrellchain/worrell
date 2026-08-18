@@ -12,6 +12,11 @@ This guide describes how to bring up a full **Worrell** node and how to turn it 
 | Mainnet chain ID | `worrell-1` |
 | Min gas price | `0.025uworrell` |
 
+> **Stay in the loop.** Upgrade notices and governance announcements for validators are
+> published on Telegram: [t.me/worrellvalidators](https://t.me/worrellvalidators) — turn on
+> notifications. Questions: [GitHub Discussions](https://github.com/worrellchain/worrell/discussions)
+> or hello@worrellchain.com.
+
 ---
 
 ## 1. Hardware requirements
@@ -422,3 +427,4 @@ By default, the REST API and gRPC listen only on localhost. If you expose them p
 - [ ] `commission-rate` ≥ 0.05 (global network minimum)
 - [ ] Node running under `systemd` with automatic restart
 - [ ] Signed-blocks monitoring active
+- [ ] Subscribed to [t.me/worrellvalidators](https://t.me/worrellvalidators) for upgrade notices

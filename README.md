@@ -202,6 +202,14 @@ Full detail: [docs/GOVERNANCE.md](docs/GOVERNANCE.md).
 
 ---
 
+## Community
+
+- **Validator announcements** (upgrades, governance, coordination): Telegram [t.me/worrellvalidators](https://t.me/worrellvalidators)
+- **Questions and support:** [GitHub Discussions](https://github.com/worrellchain/worrell/discussions) · hello@worrellchain.com
+- **News:** [@worrellchain](https://x.com/worrellchain) on X · [worrellchain.com](https://worrellchain.com)
+
+---
+
 ## Security
 
 If you find a vulnerability, please report it responsibly and privately to **security@worrellchain.com**. Please do not open public issues for security problems.
