@@ -206,7 +206,7 @@ Full detail: [docs/GOVERNANCE.md](docs/GOVERNANCE.md).
 
 - **Validator announcements** (upgrades, governance, coordination): Telegram [t.me/worrellvalidators](https://t.me/worrellvalidators)
 - **Questions and support:** [GitHub Discussions](https://github.com/worrellchain/worrell/discussions) · hello@worrellchain.com
-- **Explorer (community-run by ANODE.TEAM):** [main.anode.team/worrell](https://main.anode.team/worrell)
+- **Explorer (community-run by ANODE.TEAM):** [test.anode.team/worrell](https://test.anode.team/worrell)
 - **News:** [@worrellchain](https://x.com/worrellchain) on X · [worrellchain.com](https://worrellchain.com)
 
 ---
