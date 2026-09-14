@@ -216,7 +216,53 @@ Before creating a validator, the node must be fully synchronized:
 worrelld status 2>&1 | jq '.sync_info'
 ```
 
-When `catching_up` is `false`, the node is up to date. The network has **State Sync enabled**, which allows fast synchronization without downloading the entire history.
+When `catching_up` is `false`, the node is up to date.
+
+### 4.6 Fast synchronization with State Sync (recommended)
+
+Syncing from genesis replays the whole history: it takes hours and can exhaust the
+memory of a small machine. **State Sync** instead fetches a recent, verified snapshot
+of the chain state from public RPC nodes and gets a fresh node to the chain head in
+a few minutes. It only needs a *trust point* (a recent block height and its hash)
+that your node verifies cryptographically against the network.
+
+Community operators publish ready-to-use State Sync procedures and endpoints:
+
+- ITRocket: https://itrocket.net/services/testnet/worrell/ (State Sync section)
+- Sychonix: https://sychonix.com/testnet/worrell/
+- walkonwayvs: https://github.com/walkonwayvs/worrell-state-sync (procedure, timings vs.
+  syncing from genesis, and a trust-hash check against two independent RPCs)
+
+The generic procedure, with any public RPC from the
+[networks repo](https://github.com/worrellchain/networks) (`chain.json` → `apis.rpc`):
+
+```bash
+# 1. Stop the node and reset its data (keeps keys and config)
+sudo systemctl stop worrelld
+cp ~/.worrell/data/priv_validator_state.json ~/.worrell/priv_validator_state.json.backup
+worrelld tendermint unsafe-reset-all --home ~/.worrell
+
+# 2. Pick a trust point ~2000 blocks behind the head, from a public RPC
+SNAP_RPC="https://worrell-testnet-rpc.itrocket.net"
+LATEST=$(curl -s $SNAP_RPC/block | jq -r .result.block.header.height)
+TRUST_HEIGHT=$((LATEST - 2000))
+TRUST_HASH=$(curl -s "$SNAP_RPC/block?height=$TRUST_HEIGHT" | jq -r .result.block_id.hash)
+
+# 3. Enable state sync in config.toml  -> [statesync]
+sed -i.bak -E "s|^(enable[[:space:]]+=[[:space:]]+).*$|\1true| ; \
+s|^(rpc_servers[[:space:]]+=[[:space:]]+).*$|\1\"$SNAP_RPC,$SNAP_RPC\"| ; \
+s|^(trust_height[[:space:]]+=[[:space:]]+).*$|\1$TRUST_HEIGHT| ; \
+s|^(trust_hash[[:space:]]+=[[:space:]]+).*$|\1\"$TRUST_HASH\"|" ~/.worrell/config/config.toml
+
+# 4. Restore the signing state and start
+mv ~/.worrell/priv_validator_state.json.backup ~/.worrell/data/priv_validator_state.json
+sudo systemctl restart worrelld && sudo journalctl -u worrelld -f
+```
+
+Good practice: verify the trust hash against a **second, independent** RPC before
+trusting it (compare the `block_id.hash` returned by two providers for the same
+height). Never skip the `priv_validator_state.json` backup on a validator: it prevents
+double-signing after the reset.
 
 ---
 
