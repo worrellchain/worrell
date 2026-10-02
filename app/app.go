@@ -218,6 +218,9 @@ func New(
 		return app.App.InitChainer(ctx, req)
 	})
 
+	// register the software upgrade handlers
+	app.setupUpgradeHandlers()
+
 	if err := app.Load(loadLatest); err != nil {
 		panic(err)
 	}
