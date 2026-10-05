@@ -15,7 +15,7 @@ This guide describes how to bring up a full **Worrell** node and how to turn it 
 > **Stay in the loop.** Upgrade notices and governance announcements for validators are
 > published on Telegram: [t.me/worrellvalidators](https://t.me/worrellvalidators) — turn on
 > notifications. Questions: [GitHub Discussions](https://github.com/worrellchain/worrell/discussions)
-> or hello@worrellchain.com.
+> or hello@worrellchain.com. The procedure for chain upgrades is in [UPGRADES.md](UPGRADES.md).
 
 ---
 

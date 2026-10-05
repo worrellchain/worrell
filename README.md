@@ -199,6 +199,7 @@ Full detail: [docs/GOVERNANCE.md](docs/GOVERNANCE.md).
 - [docs/TOKENOMICS.md](docs/TOKENOMICS.md) — Genesis distribution, vesting, multisig, inflation and fees.
 - [docs/GOVERNANCE.md](docs/GOVERNANCE.md) — How governance works, proposal types and commands.
 - [docs/RUNNING-A-NODE.md](docs/RUNNING-A-NODE.md) — Requirements, installation, operation and validator creation.
+- [docs/UPGRADES.md](docs/UPGRADES.md) — How coordinated chain upgrades work and the procedure for each one.
 
 ---
 
