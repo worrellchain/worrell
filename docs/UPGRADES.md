@@ -5,7 +5,7 @@ step-by-step procedure for each upgrade.
 
 | Upgrade | From | Upgrade height | Release |
 |---------|------|----------------|---------|
-| [`v0.1.3`](#upgrade-v013) | `v0.1.2` | To be announced | [v0.1.3](https://github.com/worrellchain/worrell/releases/tag/v0.1.3) |
+| [`v0.1.3`](#upgrade-v013) | `v0.1.2` | `1186000` (estimated 13 October 2026, around 10:00 UTC) | [v0.1.3](https://github.com/worrellchain/worrell/releases/tag/v0.1.3) |
 
 > **Stay in the loop.** Upgrade heights and reminders are published on Telegram:
 > [t.me/worrellvalidators](https://t.me/worrellvalidators).
@@ -31,7 +31,8 @@ doing it soon so the chain can resume.
 | Field | Value |
 |-------|-------|
 | Upgrade name | `v0.1.3` |
-| Upgrade height | **To be announced** in the governance proposal and on Telegram |
+| Upgrade height | **`1186000`**, scheduled by governance proposal #3 |
+| Estimated time | Tuesday 13 October 2026, around 10:00 UTC. The time is an estimate; the height is what counts |
 | Upgrades from | `v0.1.2` |
 | Release | [v0.1.3](https://github.com/worrellchain/worrell/releases/tag/v0.1.3) (commit `a914f444004df7514ee909c4fa2e66a942059ca6`) |
 | Cosmos SDK | v0.53.6 (unchanged) |
