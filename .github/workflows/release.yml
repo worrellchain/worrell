@@ -5,9 +5,9 @@
 #   git tag v0.1.0
 #   git push --tags
 #
-# It cross-compiles the node for linux/amd64, linux/arm64, darwin/amd64 and
-# darwin/arm64 and attaches the tarballs to a GitHub (pre)release for that tag.
-# Review the generated release page and publish it when ready.
+# It compiles the node with a pinned Go toolchain for linux/amd64, linux/arm64,
+# darwin/amd64 and darwin/arm64 and attaches the tarballs to a GitHub (pre)release
+# for that tag. Review the generated release page and publish it when ready.
 name: Release
 
 on:
@@ -20,53 +20,51 @@ permissions:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    # ubuntu-22.04 keeps the glibc requirement of the linux/amd64 binary at 2.34
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Prepare Release Variables
-        id: vars
-        uses: ignite/cli/actions/release/vars@main
-
-      - name: Issue Release Assets
-        uses: ignite/cli/actions/cli@main
-        if: ${{ steps.vars.outputs.should_release == 'true' }}
+      # Pinned on purpose: every release is built with the same compiler.
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          args: chain build --release --release.prefix ${{ steps.vars.outputs.tarball_prefix }} -t linux:amd64 -t linux:arm64 -t darwin:amd64 -t darwin:arm64 -y
+          go-version: "1.26.5"
+
+      - name: Build release binaries
         env:
-          DO_NOT_TRACK: 1
           GOFLAGS: "-buildvcs=false"
-
-      # Ignite's release tarballs bury the binary under an internal tmp/ path.
-      # Repackage each one so `tar -xzf` yields `worrelld` at the top level,
-      # then regenerate the checksum file for the new tarballs.
-      - name: Repackage tarballs with a clean layout
-        if: ${{ steps.vars.outputs.should_release == 'true' }}
         run: |
           set -euo pipefail
-          cd release
-          for f in *.tar.gz; do
-            dir=$(mktemp -d)
-            tar -xzf "$f" -C "$dir"
-            bin=$(find "$dir" -type f -name worrelld | head -1)
-            chmod +x "$bin"
-            tar -czf "$f.new" -C "$(dirname "$bin")" worrelld
-            mv "$f.new" "$f"
-            rm -rf "$dir"
+          tag="${GITHUB_REF_NAME}"
+          version="${tag#v}"
+          commit="$(git rev-parse HEAD)"
+          ldflags="-X github.com/cosmos/cosmos-sdk/version.Name=Worrell"
+          ldflags="$ldflags -X github.com/cosmos/cosmos-sdk/version.AppName=worrelld"
+          ldflags="$ldflags -X github.com/cosmos/cosmos-sdk/version.Version=${version}"
+          ldflags="$ldflags -X github.com/cosmos/cosmos-sdk/version.Commit=${commit}"
+          mkdir -p release
+          for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64; do
+            os="${target%/*}"
+            arch="${target#*/}"
+            # linux/amd64 is built natively and links against glibc; the other targets are static
+            cgo=0
+            [ "$target" = "linux/amd64" ] && cgo=1
+            out="$(mktemp -d)"
+            GOOS="$os" GOARCH="$arch" CGO_ENABLED="$cgo" \
+              go build -mod=readonly -ldflags "$ldflags" -o "$out/worrelld" ./cmd/worrelld
+            tar -czf "release/${tag}_${os}_${arch}.tar.gz" -C "$out" worrelld
+            rm -rf "$out"
           done
+          cd release
           sha256sum *.tar.gz > release_checksum
-          echo "--- clean layout check ---"
-          for f in *.tar.gz; do echo "$f:"; tar -tzf "$f"; done
           cat release_checksum
 
       - name: Publish the Release
         uses: softprops/action-gh-release@v1
-        if: ${{ steps.vars.outputs.should_release == 'true' }}
         with:
-          tag_name: ${{ steps.vars.outputs.tag_name }}
+          tag_name: ${{ github.ref_name }}
           files: release/*
           prerelease: true
         env:
