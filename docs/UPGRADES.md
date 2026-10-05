@@ -92,6 +92,9 @@ Also, ahead of time:
 
 - **Back up** `~/.worrell/config/priv_validator_key.json` and `~/.worrell/config/node_key.json`
   if you have not done so already.
+- **Check your keys with the new binary.** Run `~/worrell-v0.1.3/worrelld keys list`, with the
+  same `--keyring-backend` you normally use, and check that your keys are listed. This does not
+  start the node. If the list is empty, see [Building from source](#4-building-from-source).
 
 ### 2. Option A — Manual upgrade
 
@@ -177,6 +180,12 @@ node, with one exception: with `--keyring-backend os` or `pass`, keys are stored
 binary's name, so keys created with one are not listed by the other. The `file` and `test`
 backends, and the validator signing key, are not affected.
 
+Keys that are not listed are not lost: they are still stored under the other name. Either
+install `v0.1.3` the same way you installed `v0.1.2`, or export each key with the old binary
+(`worrelld keys export <key-name>`) and import it with the new one
+(`worrelld keys import <key-name> <file>`), or restore it from its mnemonic
+(`worrelld keys add <key-name> --recover`).
+
 ### 5. After the upgrade
 
 ```bash
@@ -196,10 +205,12 @@ The height must keep increasing and `missed_blocks_counter` must stop growing.
 | `BINARY UPDATED BEFORE TRIGGER! UPGRADE "v0.1.3"` | The node runs `v0.1.3` before the upgrade height | Put `v0.1.2` back and restart; switch again after the node stops at the height |
 | `version 'GLIBC_2.34' not found` | The operating system is too old for the `linux_amd64` binary | Build from source |
 | The node runs `v0.1.3` but the height does not move | Less than 2/3 of the voting power has upgraded yet | Wait; nothing to do on your side |
+| `worrelld keys list` is empty with the new binary | Keys are stored under the other binary name (`os` or `pass` keyring) | See [Building from source](#4-building-from-source) |
 
 **Upgrading late.** A validator that misses the upgrade height can upgrade afterwards with
-the same steps: the node catches up and signs again. On the testnet a validator is jailed for
-downtime after missing about 9,500 blocks (roughly 14 hours).
+the same steps: the node catches up and signs again. Late upgrades delay everyone: the chain
+does not resume until more than 2/3 of the voting power has upgraded. Once it resumes, a
+validator that is still on the old binary is jailed for downtime after missing about 9,500 blocks.
 
 **New nodes after the upgrade.** A node syncing from genesis must start with `v0.1.2`; it
 stops at the upgrade height like everyone else and continues with `v0.1.3`. A node that uses
