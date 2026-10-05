@@ -75,12 +75,14 @@ echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
 export PATH="$HOME/bin:$PATH"
 ```
 
-The binary is statically linked and self-contained — no Go toolchain or other
-dependencies are required.
+No Go toolchain is required. The `linux_arm64` binary is statically linked; the
+`linux_amd64` binary needs glibc 2.34 or newer (Ubuntu 22.04+, Debian 12+; check with
+`ldd --version`). On older systems, build from source (Option B).
 
 ### Option B — Build from source
 
-Dependencies: **Go 1.25+** (see `go.mod` for the exact minimum), **git**, **make**, **build-essential**.
+Dependencies: **Go**, **git**, **make**, **build-essential**. **Go 1.26.5** is recommended: it is
+the toolchain the official binaries are built with (`go.mod` accepts 1.25.10 or newer).
 
 Installing dependencies on Ubuntu 22.04:
 
@@ -88,11 +90,11 @@ Installing dependencies on Ubuntu 22.04:
 sudo apt update && sudo apt install -y git curl build-essential
 ```
 
-Installing Go (example with Go 1.25):
+Installing Go 1.26.5:
 
 ```bash
-curl -LO https://go.dev/dl/go1.25.13.linux-amd64.tar.gz
-sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.25.13.linux-amd64.tar.gz
+curl -LO https://go.dev/dl/go1.26.5.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.26.5.linux-amd64.tar.gz
 echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> ~/.profile
 source ~/.profile
 go version
@@ -462,7 +464,7 @@ By default, the REST API and gRPC listen only on localhost. If you expose them p
 
 ## 8. Quick checklist
 
-- [ ] Go 1.25+ installed and `worrelld version` works
+- [ ] `worrelld` installed (prebuilt binary, or built from source with Go 1.26.5) and `worrelld version` works
 - [ ] Node initialized with `--chain-id worrell-testnet-1`
 - [ ] Official `genesis.json` placed and validated
 - [ ] `seeds` / `persistent_peers` configured
