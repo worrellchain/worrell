@@ -8,6 +8,10 @@
 # It compiles the node with a pinned Go toolchain for linux/amd64, linux/arm64,
 # darwin/amd64 and darwin/arm64 and attaches the tarballs to a GitHub (pre)release
 # for that tag. Review the generated release page and publish it when ready.
+#
+# All four binaries are statically linked (CGO disabled) and report the same
+# application name (`worrell`) and version (the tag, e.g. `v0.2.0`) as a binary
+# built with `make install`, so both installation paths behave identically.
 name: Release
 
 on:
@@ -20,7 +24,6 @@ permissions:
 
 jobs:
   release:
-    # ubuntu-22.04 keeps the glibc requirement of the linux/amd64 binary at 2.34
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -38,9 +41,12 @@ jobs:
         run: |
           set -euo pipefail
           tag="${GITHUB_REF_NAME}"
-          version="${tag#v}"
+          # The version is the tag itself (with the leading "v"), as `make install` reports it.
+          version="${tag}"
           commit="$(git rev-parse HEAD)"
-          ldflags="-X github.com/cosmos/cosmos-sdk/version.Name=Worrell"
+          # Same application name as the Makefile (APPNAME). It is also the keyring service
+          # name for the `os` and `pass` backends, so it must not differ between builds.
+          ldflags="-X github.com/cosmos/cosmos-sdk/version.Name=worrell"
           ldflags="$ldflags -X github.com/cosmos/cosmos-sdk/version.AppName=worrelld"
           ldflags="$ldflags -X github.com/cosmos/cosmos-sdk/version.Version=${version}"
           ldflags="$ldflags -X github.com/cosmos/cosmos-sdk/version.Commit=${commit}"
@@ -48,11 +54,9 @@ jobs:
           for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64; do
             os="${target%/*}"
             arch="${target#*/}"
-            # linux/amd64 is built natively and links against glibc; the other targets are static
-            cgo=0
-            [ "$target" = "linux/amd64" ] && cgo=1
+            # Every target is statically linked: no glibc (or any other library) requirement.
             out="$(mktemp -d)"
-            GOOS="$os" GOARCH="$arch" CGO_ENABLED="$cgo" \
+            GOOS="$os" GOARCH="$arch" CGO_ENABLED=0 \
               go build -mod=readonly -ldflags "$ldflags" -o "$out/worrelld" ./cmd/worrelld
             tar -czf "release/${tag}_${os}_${arch}.tar.gz" -C "$out" worrelld
             rm -rf "$out"
