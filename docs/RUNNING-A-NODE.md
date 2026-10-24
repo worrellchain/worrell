@@ -81,7 +81,7 @@ No Go toolchain is required. The `linux_arm64` binary is statically linked; the
 
 ### Option B — Build from source
 
-Dependencies: **Go**, **git**, **make**, **build-essential**. **Go 1.26.5** is recommended: it is
+Dependencies: **Go**, **git**, **make**, **build-essential**. **Go 1.26.10** is recommended: it is
 the toolchain the official binaries are built with (`go.mod` accepts 1.25.10 or newer).
 
 Installing dependencies on Ubuntu 22.04:
@@ -90,11 +90,11 @@ Installing dependencies on Ubuntu 22.04:
 sudo apt update && sudo apt install -y git curl build-essential
 ```
 
-Installing Go 1.26.5:
+Installing Go 1.26.10:
 
 ```bash
-curl -LO https://go.dev/dl/go1.26.5.linux-amd64.tar.gz
-sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.26.5.linux-amd64.tar.gz
+curl -LO https://go.dev/dl/go1.26.10.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.26.10.linux-amd64.tar.gz
 echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> ~/.profile
 source ~/.profile
 go version
@@ -464,7 +464,7 @@ By default, the REST API and gRPC listen only on localhost. If you expose them p
 
 ## 8. Quick checklist
 
-- [ ] `worrelld` installed (prebuilt binary, or built from source with Go 1.26.5) and `worrelld version` works
+- [ ] `worrelld` installed (prebuilt binary, or built from source with Go 1.26.10) and `worrelld version` works
 - [ ] Node initialized with `--chain-id worrell-testnet-1`
 - [ ] Official `genesis.json` placed and validated
 - [ ] `seeds` / `persistent_peers` configured
