@@ -29,9 +29,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Pinned on purpose: every release is built with the same compiler. Bump it to the
-      # latest Go 1.26.x before tagging a release, so the binaries carry the standard
-      # library security fixes (net/http, crypto/tls, ...).
+      # Pinned on purpose: every release is built with the same compiler.
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
