@@ -13,7 +13,7 @@
 | Data directory | `~/.worrell/` |
 | Address prefix | `worrell` (addresses `worrell1...`) |
 | Mainnet chain ID | `worrell-1` |
-| Testnet chain ID | `worrell-testnet-1` |
+| Testnet chain IDs | `worrell-testnet-1` (active), `worrell-testnet-2` (genesis ceremony) |
 | License | Apache 2.0 |
 
 ---
@@ -96,6 +96,9 @@ worrelld start
 ```
 
 Full guide to operating a node and creating a validator: [docs/RUNNING-A-NODE.md](docs/RUNNING-A-NODE.md).
+Genesis files, peers and per-network details: [worrellchain/networks](https://github.com/worrellchain/networks).
+To take part in the `worrell-testnet-2` genesis ceremony, see its
+[guide](https://github.com/worrellchain/networks/tree/main/worrell-testnet-2).
 
 ---
 

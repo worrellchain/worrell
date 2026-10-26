@@ -81,10 +81,11 @@ version: 0.1.3
 
 Also, ahead of time:
 
-- **Check your system.** The `linux_amd64` binary needs glibc 2.34 or newer (Ubuntu 22.04+,
-  Debian 12+); check with `ldd --version`. On older systems it fails to start with
-  `version 'GLIBC_2.34' not found`: [build from source](#4-building-from-source) instead.
-  The `linux_arm64` binary is statically linked and has no such requirement.
+- **Check your system.** The `linux_amd64` binary of `v0.1.3` needs glibc 2.34 or newer
+  (Ubuntu 22.04+, Debian 12+); check with `ldd --version`. On older systems it fails to start
+  with `version 'GLIBC_2.34' not found`: [build from source](#4-building-from-source) instead.
+  The `linux_arm64` binary is statically linked and has no such requirement. From `v0.2.0` on,
+  every release binary is statically linked and this check is no longer needed.
 - **Locate the binary your node is running**, so you replace the right file:
 
   ```bash
@@ -180,6 +181,13 @@ official one reports `version: 0.1.3` and `name: Worrell`. The difference is cos
 node, with one exception: with `--keyring-backend os` or `pass`, keys are stored under the
 binary's name, so keys created with one are not listed by the other. The `file` and `test`
 backends, and the validator signing key, are not affected.
+
+This applies to `v0.1.3` and earlier releases only. From `v0.2.0` on, the official binaries
+report the same `name: worrell` and the same version string (with the leading `v`) as a binary
+built with `make install`, so the two installation paths share the keyring. Note that a node
+that moves from the official `v0.1.3` to `v0.2.0` changes the name from `Worrell` to `worrell`:
+if it uses the `os` or `pass` backend, its keys are still stored under the old name and can be
+exported and imported as described below.
 
 Keys that are not listed are not lost: they are still stored under the other name. Either
 install `v0.1.3` the same way you installed `v0.1.2`, or export each key with the old binary

@@ -8,9 +8,18 @@ This guide describes how to bring up a full **Worrell** node and how to turn it 
 | Token | WORRELL (base denomination: `uworrell`, 6 decimals) |
 | 1 WORRELL | 1,000,000 uworrell |
 | Data directory | `~/.worrell` |
-| Testnet chain ID | `worrell-testnet-1` |
 | Mainnet chain ID | `worrell-1` |
 | Min gas price | `0.025uworrell` |
+
+Networks (the per-network files live in [worrellchain/networks](https://github.com/worrellchain/networks)):
+
+| Network | Chain ID | Status |
+|---------|----------|--------|
+| Testnet 1 | `worrell-testnet-1` | Active; this guide uses it in the examples |
+| Testnet 2 | `worrell-testnet-2` | Genesis ceremony: see the [ceremony guide](https://github.com/worrellchain/networks/tree/main/worrell-testnet-2) |
+
+To join another network, replace the chain ID, the genesis file, the peers and, if the node
+shares a server with another Worrell node, the data directory (`--home`) and the ports.
 
 > **Stay in the loop.** Upgrade notices and governance announcements for validators are
 > published on Telegram: [t.me/worrellvalidators](https://t.me/worrellvalidators) — turn on
@@ -25,9 +34,9 @@ This guide describes how to bring up a full **Worrell** node and how to turn it 
 
 | Resource | Recommendation |
 |---------|---------------|
-| Operating system | Ubuntu 22.04 LTS |
+| Operating system | Ubuntu 24.04 LTS |
 | CPU | 2 vCPU |
-| RAM | 4 GB |
+| RAM | 8 GB |
 | Disk | 100 GB SSD |
 | Network | Stable connection, public IP for the P2P ports |
 
@@ -37,7 +46,7 @@ For a mainnet validator more headroom is recommended, since the node must sign b
 
 | Resource | Recommendation |
 |---------|---------------|
-| Operating system | Ubuntu 22.04 LTS |
+| Operating system | Ubuntu 24.04 LTS |
 | CPU | 4 vCPU or more |
 | RAM | 16 GB or more |
 | Disk | 500 GB+ NVMe SSD (with room to grow) |
@@ -75,16 +84,16 @@ echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
 export PATH="$HOME/bin:$PATH"
 ```
 
-No Go toolchain is required. The `linux_arm64` binary is statically linked; the
-`linux_amd64` binary needs glibc 2.34 or newer (Ubuntu 22.04+, Debian 12+; check with
-`ldd --version`). On older systems, build from source (Option B).
+No Go toolchain is required. From `v0.2.0` on, every binary is statically linked: it needs no
+system libraries and runs on any 64-bit Linux (or macOS 12 or newer). Only the `linux_amd64`
+binary of `v0.1.3` and earlier releases was dynamically linked and needed glibc 2.34 or newer.
 
 ### Option B — Build from source
 
 Dependencies: **Go**, **git**, **make**, **build-essential**. **Go 1.26.10** is recommended: it is
 the toolchain the official binaries are built with (`go.mod` accepts 1.25.10 or newer).
 
-Installing dependencies on Ubuntu 22.04:
+Installing dependencies on Ubuntu:
 
 ```bash
 sudo apt update && sudo apt install -y git curl build-essential

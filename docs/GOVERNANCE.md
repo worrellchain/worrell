@@ -58,8 +58,11 @@ are detailed in section [4. Deposit rules](#4-deposit-rules).
 ## 2. Standard proposals
 
 Governance module parameters for standard proposals. The **Testnet** column
-shows the reduced values used in `worrell-testnet-1` so the full cycle can be
-tested in minutes instead of days.
+shows the reduced values of the `worrell-testnet-1` genesis, chosen so the full
+cycle could be tested in minutes. Since proposal #1 (September 2026) the live
+values on `worrell-testnet-1` are the mainnet ones: 7-day voting period, 24-hour
+expedited voting period and 14-day deposit period. `worrell-testnet-2` starts
+with the mainnet values. Check the live parameters with `worrelld q gov params`.
 
 | Parameter | Mainnet value | Testnet value |
 |-----------|---------------|---------------|
@@ -250,7 +253,8 @@ worrelld tx gov deposit 1 1500000000uworrell \
   --yes
 ```
 
-> `1` is the `proposal-id`. On testnet use `--chain-id worrell-testnet-1`.
+> `1` is the `proposal-id`. On a testnet use its chain ID: `--chain-id worrell-testnet-1`
+> or `--chain-id worrell-testnet-2`.
 
 ### 8.2 Query proposals
 
