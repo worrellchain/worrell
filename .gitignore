@@ -1,4 +1,4 @@
-# Binarios y artefactos de build
+# Binaries and build artifacts
 /build/
 release/
 worrelld
@@ -6,13 +6,13 @@ worrelld
 *.test
 *.out
 
-# Dependencias
+# Dependencies
 vendor/
 node_modules/
 vue/node_modules
 vue/dist
 
-# Datos del nodo y claves (NUNCA subir)
+# Node data and keys (NEVER commit)
 .worrell/
 *.key
 *.pem
@@ -23,21 +23,24 @@ keyring-*/
 mnemonic*.txt
 *.mnemonic
 
-# Variables de entorno y secretos
+# Environment variables and secrets
 .env
 .env.*
 *.secret
 
-# Editores y SO
+# Editors, assistants and OS
 .idea/
 .vscode/
+.claude/
+CLAUDE.md
+.mcp.json
 .DS_Store
 
-# Logs y temporales
+# Logs and temporary files
 *.log
 *.dot
 *.ign
 tmp/
 
-# La configuración de redes vive en su propio repositorio: worrellchain/networks
+# Network configuration lives in its own repository: worrellchain/networks
 networks/
