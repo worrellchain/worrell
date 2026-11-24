@@ -1,15 +1,10 @@
 package app
 
 import (
-	"io"
-
 	clienthelpers "cosmossdk.io/client/v2/helpers"
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/depinject"
-	"cosmossdk.io/log"
-	storetypes "cosmossdk.io/store/types"
-	circuitkeeper "cosmossdk.io/x/circuit/keeper"
-	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
+	"cosmossdk.io/log/v2"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 	dbm "github.com/cosmos/cosmos-db"
@@ -22,6 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -36,14 +32,13 @@ import (
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
-	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	icacontrollerkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/keeper"
-	icahostkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/keeper"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
-	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
+	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
+	icacontrollerkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/controller/keeper"
+	icahostkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/host/keeper"
+	ibctransferkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/keeper"
+	ibckeeper "github.com/lfdt-ibc/ibc-go/v11/modules/core/keeper"
 
 	"github.com/worrellchain/worrell/docs"
 	worrellmodulekeeper "github.com/worrellchain/worrell/x/worrell/keeper"
@@ -89,14 +84,12 @@ type App struct {
 	UpgradeKeeper         *upgradekeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	ConsensusParamsKeeper consensuskeeper.Keeper
-	CircuitBreakerKeeper  circuitkeeper.Keeper
-	ParamsKeeper          paramskeeper.Keeper
 
 	// ibc keepers
 	IBCKeeper           *ibckeeper.Keeper
-	ICAControllerKeeper icacontrollerkeeper.Keeper
-	ICAHostKeeper       icahostkeeper.Keeper
-	TransferKeeper      ibctransferkeeper.Keeper
+	ICAControllerKeeper *icacontrollerkeeper.Keeper
+	ICAHostKeeper       *icahostkeeper.Keeper
+	TransferKeeper      *ibctransferkeeper.Keeper
 
 	// simulation manager
 	sm            *module.SimulationManager
@@ -129,7 +122,6 @@ func AppConfig() depinject.Config {
 func New(
 	logger log.Logger,
 	db dbm.DB,
-	traceStore io.Writer,
 	loadLatest bool,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
@@ -178,8 +170,6 @@ func New(
 		&app.UpgradeKeeper,
 		&app.AuthzKeeper,
 		&app.ConsensusParamsKeeper,
-		&app.CircuitBreakerKeeper,
-		&app.ParamsKeeper,
 		&app.WorrellKeeper,
 	); err != nil {
 		panic(err)
@@ -190,7 +180,7 @@ func New(
 	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 
 	// build app
-	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
+	app.App = appBuilder.Build(db, baseAppOptions...)
 
 	// register legacy modules
 	if err := app.registerIBCModules(appOpts); err != nil {
@@ -201,7 +191,7 @@ func New(
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	overrideModules := map[string]module.AppModuleSimulation{
-		authtypes.ModuleName: auth.NewAppModule(app.appCodec, app.AuthKeeper, authsims.RandomGenesisAccounts, nil),
+		authtypes.ModuleName: auth.NewAppModule(app.appCodec, app.AuthKeeper, authsims.RandomGenesisAccounts),
 	}
 	app.sm = module.NewSimulationManagerFromAppModules(app.ModuleManager.Modules, overrideModules)
 
@@ -226,12 +216,6 @@ func New(
 	}
 
 	return app
-}
-
-// GetSubspace returns a param subspace for a given module name.
-func (app *App) GetSubspace(moduleName string) paramstypes.Subspace {
-	subspace, _ := app.ParamsKeeper.GetSubspace(moduleName)
-	return subspace
 }
 
 // LegacyAmino returns App's amino codec.

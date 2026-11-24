@@ -3,13 +3,11 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 
-	"cosmossdk.io/log"
+	"cosmossdk.io/log/v2"
 	"cosmossdk.io/math"
-	storetypes "cosmossdk.io/store/types"
 	"github.com/cometbft/cometbft/crypto"
 	"github.com/cometbft/cometbft/libs/bytes"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
@@ -19,6 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
@@ -59,9 +58,9 @@ it enables developers to configure their local environments to reflect mainnet c
 
 // newTestnetApp starts by running the normal newApp method. From there, the app interface returned is modified in order
 // for a testnet to be created from the provided app.
-func newTestnetApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
+func newTestnetApp(logger log.Logger, db dbm.DB, appOpts servertypes.AppOptions) servertypes.Application {
 	// Create an app and type cast to an App
-	newApp := newApp(logger, db, traceStore, appOpts)
+	newApp := newApp(logger, db, appOpts)
 	testApp, ok := newApp.(*app.App)
 	if !ok {
 		panic("app created from newApp is not of type App")
@@ -79,7 +78,7 @@ func newTestnetApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts s
 func initAppForTestnet(app *app.App, args valArgs) *app.App {
 	// Required Changes:
 	//
-	ctx := app.App.NewUncachedContext(true, cmtproto.Header{})
+	ctx := app.App.NewNextBlockContext(cmtproto.Header{})
 
 	pubkey := &ed25519.PubKey{Key: args.newValPubKey.Bytes()}
 	pubkeyAny, err := codectypes.NewAnyWithValue(pubkey)
@@ -190,6 +189,10 @@ func initAppForTestnet(app *app.App, args valArgs) *app.App {
 
 		handleErr(app.BankKeeper.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, account, defaultCoins))
 	}
+
+	// flush the out-of-band state changes to the root CommitMultiStore,
+	// they are committed with the first block of the testnet
+	app.App.SimWriteState()
 
 	return app
 }

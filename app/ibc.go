@@ -2,34 +2,33 @@ package app
 
 import (
 	"cosmossdk.io/core/appmodule"
-	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	icamodule "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts"
-	icacontroller "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller"
-	icacontrollerkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/keeper"
-	icacontrollertypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/types"
-	icahost "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host"
-	icahostkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/keeper"
-	icahosttypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
-	ibctransfer "github.com/cosmos/ibc-go/v10/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
-	ibctransferv2 "github.com/cosmos/ibc-go/v10/modules/apps/transfer/v2"
-	ibc "github.com/cosmos/ibc-go/v10/modules/core"
-	ibcclienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types" // nolint:staticcheck // Deprecated: params key table is needed for params migration
-	ibcconnectiontypes "github.com/cosmos/ibc-go/v10/modules/core/03-connection/types"
-	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
-	ibcapi "github.com/cosmos/ibc-go/v10/modules/core/api"
-	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
-	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
-	solomachine "github.com/cosmos/ibc-go/v10/modules/light-clients/06-solomachine"
-	ibctm "github.com/cosmos/ibc-go/v10/modules/light-clients/07-tendermint"
+	icamodule "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts"
+	icacontroller "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/controller"
+	icacontrollerkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/controller/keeper"
+	icacontrollertypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/controller/types"
+	icahost "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/host"
+	icahostkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/host/keeper"
+	icahosttypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/types"
+	ibctransfer "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer"
+	ibctransferkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/types"
+	ibctransferv2 "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/v2"
+	ibc "github.com/lfdt-ibc/ibc-go/v11/modules/core"
+	ibcclienttypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/02-client/types"
+	porttypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/05-port/types"
+	ibcapi "github.com/lfdt-ibc/ibc-go/v11/modules/core/api"
+	ibcexported "github.com/lfdt-ibc/ibc-go/v11/modules/core/exported"
+	ibckeeper "github.com/lfdt-ibc/ibc-go/v11/modules/core/keeper"
+	solomachine "github.com/lfdt-ibc/ibc-go/v11/modules/light-clients/06-solomachine"
+	ibctm "github.com/lfdt-ibc/ibc-go/v11/modules/light-clients/07-tendermint"
 )
 
 // registerIBCModules register IBC keepers and non dependency inject modules.
@@ -44,21 +43,12 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		return err
 	}
 
-	// register the key tables for legacy param subspaces
-	keyTable := ibcclienttypes.ParamKeyTable()
-	keyTable.RegisterParamSet(&ibcconnectiontypes.Params{})
-	app.ParamsKeeper.Subspace(ibcexported.ModuleName).WithKeyTable(keyTable)
-	app.ParamsKeeper.Subspace(ibctransfertypes.ModuleName).WithKeyTable(ibctransfertypes.ParamKeyTable())
-	app.ParamsKeeper.Subspace(icacontrollertypes.SubModuleName).WithKeyTable(icacontrollertypes.ParamKeyTable())
-	app.ParamsKeeper.Subspace(icahosttypes.SubModuleName).WithKeyTable(icahosttypes.ParamKeyTable())
-
 	govModuleAddr, _ := app.AuthKeeper.AddressCodec().BytesToString(authtypes.NewModuleAddress(govtypes.ModuleName))
 
 	// Create IBC keeper
 	app.IBCKeeper = ibckeeper.NewKeeper(
 		app.appCodec,
 		runtime.NewKVStoreService(app.GetKey(ibcexported.StoreKey)),
-		app.GetSubspace(ibcexported.ModuleName),
 		app.UpgradeKeeper,
 		govModuleAddr,
 	)
@@ -66,9 +56,8 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// Create IBC transfer keeper
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		app.appCodec,
+		app.AuthKeeper.AddressCodec(),
 		runtime.NewKVStoreService(app.GetKey(ibctransfertypes.StoreKey)),
-		app.GetSubspace(ibctransfertypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper,
 		app.IBCKeeper.ChannelKeeper,
 		app.MsgServiceRouter(),
 		app.AuthKeeper,
@@ -80,8 +69,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
 		app.appCodec,
 		runtime.NewKVStoreService(app.GetKey(icahosttypes.StoreKey)),
-		app.GetSubspace(icahosttypes.SubModuleName),
-		app.IBCKeeper.ChannelKeeper, // ICS4Wrapper
 		app.IBCKeeper.ChannelKeeper,
 		app.AuthKeeper,
 		app.MsgServiceRouter(),
@@ -92,8 +79,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	app.ICAControllerKeeper = icacontrollerkeeper.NewKeeper(
 		app.appCodec,
 		runtime.NewKVStoreService(app.GetKey(icacontrollertypes.StoreKey)),
-		app.GetSubspace(icacontrollertypes.SubModuleName),
-		app.IBCKeeper.ChannelKeeper,
 		app.IBCKeeper.ChannelKeeper,
 		app.MsgServiceRouter(),
 		govModuleAddr,
@@ -133,7 +118,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	if err := app.RegisterModules(
 		ibc.NewAppModule(app.IBCKeeper),
 		ibctransfer.NewAppModule(app.TransferKeeper),
-		icamodule.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
+		icamodule.NewAppModule(app.ICAControllerKeeper, app.ICAHostKeeper),
 		ibctm.NewAppModule(tmLightClientModule),
 		solomachine.NewAppModule(soloLightClientModule),
 	); err != nil {
@@ -149,7 +134,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 func RegisterIBC(cdc codec.Codec) map[string]appmodule.AppModule {
 	modules := map[string]appmodule.AppModule{
 		ibcexported.ModuleName:      ibc.NewAppModule(&ibckeeper.Keeper{}),
-		ibctransfertypes.ModuleName: ibctransfer.NewAppModule(ibctransferkeeper.Keeper{}),
+		ibctransfertypes.ModuleName: ibctransfer.NewAppModule(&ibctransferkeeper.Keeper{}),
 		icatypes.ModuleName:         icamodule.NewAppModule(&icacontrollerkeeper.Keeper{}, &icahostkeeper.Keeper{}),
 		ibctm.ModuleName:            ibctm.NewAppModule(ibctm.NewLightClientModule(cdc, ibcclienttypes.StoreProvider{})),
 		solomachine.ModuleName:      solomachine.NewAppModule(solomachine.NewLightClientModule(cdc, ibcclienttypes.StoreProvider{})),
