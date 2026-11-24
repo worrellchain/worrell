@@ -15,8 +15,8 @@ Networks (the per-network files live in [worrellchain/networks](https://github.c
 
 | Network | Chain ID | Status |
 |---------|----------|--------|
-| Testnet 1 | `worrell-testnet-1` | Active; this guide uses it in the examples |
-| Testnet 2 | `worrell-testnet-2` | Genesis ceremony: see the [ceremony guide](https://github.com/worrellchain/networks/tree/main/worrell-testnet-2) |
+| Testnet 2 | `worrell-testnet-2` | Active; this guide uses it in the examples. Parameters, endpoints and faucet: [network guide](https://github.com/worrellchain/networks/tree/main/worrell-testnet-2) |
+| Testnet 1 | `worrell-testnet-1` | Closed. Its files stay in the networks repository for reference |
 
 To join another network, replace the chain ID, the genesis file, the peers and, if the node
 shares a server with another Worrell node, the data directory (`--home`) and the ports.
@@ -134,7 +134,7 @@ worrelld --help
 Initialize the node's local configuration by choosing a *moniker* (the public name of your node):
 
 ```bash
-worrelld init <moniker> --chain-id worrell-testnet-1
+worrelld init <moniker> --chain-id worrell-testnet-2
 ```
 
 This creates the data directory at `~/.worrell` with the following relevant structure:
@@ -155,29 +155,36 @@ Replace the locally generated genesis with the network's official genesis, publi
 [worrellchain/networks](https://github.com/worrellchain/networks):
 
 ```bash
-curl -s https://raw.githubusercontent.com/worrellchain/networks/main/worrell-testnet-1/genesis.json \
+curl -s https://raw.githubusercontent.com/worrellchain/networks/main/worrell-testnet-2/genesis.json \
   -o ~/.worrell/config/genesis.json
 worrelld genesis validate-genesis
 ```
 
 Verify that you have the exact official file by checking its sha256 against the one
-published in the [networks README](https://github.com/worrellchain/networks#join-the-testnet):
+published in the [network guide](https://github.com/worrellchain/networks/tree/main/worrell-testnet-2):
 
 ```bash
 shasum -a 256 ~/.worrell/config/genesis.json
-# expected: a81c507b12ba0678c3172394ff4bb03e1c3db60050cc5568c127a24ec19378fd
+# expected: ed4555669ba42158ee97a59d9f4b527f8491833848a3e2440d38d127f89a018a
 ```
 
 ### 4.2 Configure peers and seeds
 
 Edit `~/.worrell/config/config.toml` and set `persistent_peers` in the `[p2p]` section
-(format `<node_id>@<host>:26656`). The up-to-date peer list is published in
-[`worrell-testnet-1/chain.json`](https://github.com/worrellchain/networks/blob/main/worrell-testnet-1/chain.json)
-(`peers` section). Current bootstrap peer:
+(format `<node_id>@<host>:<port>`). The peer list is published in
+[`worrell-testnet-2/peers.txt`](https://github.com/worrellchain/networks/blob/main/worrell-testnet-2/peers.txt),
+one peer per line. To set all of them at once:
+
+```bash
+PEERS=$(curl -s https://raw.githubusercontent.com/worrellchain/networks/main/worrell-testnet-2/peers.txt | paste -sd, -)
+sed -i "s|^persistent_peers = .*|persistent_peers = \"$PEERS\"|" ~/.worrell/config/config.toml
+```
+
+The founder's node is the first entry of that list:
 
 ```toml
 # ~/.worrell/config/config.toml  -> [p2p]
-persistent_peers = "bb9164c1bd9ed9ff2c0fd9e09b23285698e231de@164.68.98.186:26656"
+persistent_peers = "4ae3601a733c88a1b8f377774ff197dbd3e377c6@144.91.82.147:26656"
 ```
 
 ### 4.3 Set the minimum gas price
@@ -237,15 +244,14 @@ of the chain state from public RPC nodes and gets a fresh node to the chain head
 a few minutes. It only needs a *trust point* (a recent block height and its hash)
 that your node verifies cryptographically against the network.
 
-Community operators publish ready-to-use State Sync procedures and endpoints:
+Community operators may publish ready-to-use State Sync procedures and endpoints for
+`worrell-testnet-2`; see the services pages linked from the
+[network guide](https://github.com/worrellchain/networks/tree/main/worrell-testnet-2).
+The procedure written by walkonwayvs for `worrell-testnet-1`
+(https://github.com/walkonwayvs/worrell-state-sync) also applies: timings compared with
+syncing from genesis, and a trust-hash check against two independent RPCs.
 
-- ITRocket: https://itrocket.net/services/testnet/worrell/ (State Sync section)
-- Sychonix: https://sychonix.com/testnet/worrell/
-- walkonwayvs: https://github.com/walkonwayvs/worrell-state-sync (procedure, timings vs.
-  syncing from genesis, and a trust-hash check against two independent RPCs)
-
-The generic procedure, with any public RPC from the
-[networks repo](https://github.com/worrellchain/networks) (`chain.json` → `apis.rpc`):
+The generic procedure, with any public RPC listed in the network guide:
 
 ```bash
 # 1. Stop the node and reset its data (keeps keys and config)
@@ -254,7 +260,7 @@ cp ~/.worrell/data/priv_validator_state.json ~/.worrell/priv_validator_state.jso
 worrelld tendermint unsafe-reset-all --home ~/.worrell
 
 # 2. Pick a trust point ~2000 blocks behind the head, from a public RPC
-SNAP_RPC="https://worrell-testnet-rpc.itrocket.net"
+SNAP_RPC="https://worrell-rpc-t2.crptcpchk.com"
 LATEST=$(curl -s $SNAP_RPC/block | jq -r .result.block.header.height)
 TRUST_HEIGHT=$((LATEST - 2000))
 TRUST_HASH=$(curl -s "$SNAP_RPC/block?height=$TRUST_HEIGHT" | jq -r .result.block_id.hash)
@@ -279,10 +285,10 @@ double-signing after the reset.
 
 ## 5. Create a validator
 
-> You need: a synchronized node (`catching_up: false`) and an account with sufficient WORRELL balance. On testnet you can request funds from the faucet (500 WORRELL per request, rate-limited to once per hour per address):
+> You need: a synchronized node (`catching_up: false`) and an account with sufficient WORRELL balance. On `worrell-testnet-2` you can request funds from the faucet (100 WORRELL per request; one request per address, at most 3 per IP and 300 in total every 24 hours). The faucet is closed at the moment. The request, when it is open:
 >
 > ```bash
-> curl -X POST http://164.68.98.186:4500 \
+> curl -X POST http://144.91.82.147:4500 \
 >   -H "Content-Type: application/json" \
 >   -d '{"address":"worrell1YOURADDRESS..."}'
 > ```
@@ -319,7 +325,7 @@ The modern Cosmos SDK command takes a JSON file with the validator definition. C
 ```json
 {
   "pubkey": {"@type":"/cosmos.crypto.ed25519.PubKey","key":"<YOUR_PUBKEY>"},
-  "amount": "20000000000000uworrell",
+  "amount": "95000000uworrell",
   "moniker": "<moniker>",
   "identity": "",
   "website": "",
@@ -337,7 +343,7 @@ And submit it:
 ```bash
 worrelld tx staking create-validator validator.json \
   --from <key-name> \
-  --chain-id worrell-testnet-1 \
+  --chain-id worrell-testnet-2 \
   --gas auto \
   --gas-adjustment 1.5 \
   --gas-prices 0.025uworrell \
@@ -349,14 +355,14 @@ If your binary version uses the flag-based form, the equivalent is:
 ```bash
 worrelld tx staking create-validator \
   --pubkey="$(worrelld tendermint show-validator)" \
-  --amount="20000000000000uworrell" \
+  --amount="95000000uworrell" \
   --moniker="<moniker>" \
   --commission-rate="0.05" \
   --commission-max-rate="0.25" \
   --commission-max-change-rate="0.01" \
   --min-self-delegation="1000000" \
   --from=<key-name> \
-  --chain-id=worrell-testnet-1 \
+  --chain-id=worrell-testnet-2 \
   --gas=auto \
   --gas-adjustment=1.5 \
   --gas-prices=0.025uworrell \
@@ -367,7 +373,7 @@ worrelld tx staking create-validator \
 
 | Flag / field | Example value | Meaning |
 |--------------|-------------------|-------------|
-| `--amount` | `20000000000000uworrell` | Initial self-delegation (in this example, 20,000,000 WORRELL). Adjust to your case. |
+| `--amount` | `95000000uworrell` | Initial self-delegation (in this example, 95 WORRELL: what one faucet request gives, minus fees). Adjust to your case. |
 | `--commission-rate` | `0.05` | Current commission: 5%. **It cannot be lower than the global network minimum (5%).** |
 | `--commission-max-rate` | `0.25` | Maximum commission **this validator** allows itself: 25%. You set it. |
 | `--commission-max-change-rate` | `0.01` | Maximum commission change per day: 1%. You set it. |
@@ -418,7 +424,7 @@ The result includes `missed_blocks_counter` (blocks not signed within the window
 | Minimum signed per window | 5% (0.05) | You must sign at least 5% of the blocks in the window |
 | Downtime penalty | 0.01% (0.0001) | Slash when jailed for inactivity |
 | Double-signing penalty | 5% (0.05) | Slash for signing two blocks at the same height |
-| Jail duration for downtime | 300s (5 min) on testnet / 43,200s (12 h) on mainnet | Minimum time jailed |
+| Jail duration for downtime | 43,200 s (12 hours) on `worrell-testnet-2` and on mainnet | Minimum time jailed |
 
 To **avoid jailing due to downtime**:
 
@@ -434,7 +440,7 @@ If your validator was jailed for downtime, once the jail period has elapsed you 
 ```bash
 worrelld tx slashing unjail \
   --from <key-name> \
-  --chain-id worrell-testnet-1 \
+  --chain-id worrell-testnet-2 \
   --gas auto \
   --gas-adjustment 1.5 \
   --gas-prices 0.025uworrell \
@@ -474,7 +480,7 @@ By default, the REST API and gRPC listen only on localhost. If you expose them p
 ## 8. Quick checklist
 
 - [ ] `worrelld` installed (prebuilt binary, or built from source with Go 1.26.10) and `worrelld version` works
-- [ ] Node initialized with `--chain-id worrell-testnet-1`
+- [ ] Node initialized with `--chain-id worrell-testnet-2`
 - [ ] Official `genesis.json` placed and validated
 - [ ] `seeds` / `persistent_peers` configured
 - [ ] `minimum-gas-prices = "0.025uworrell"` in `app.toml`

@@ -253,8 +253,7 @@ worrelld tx gov deposit 1 1500000000uworrell \
   --yes
 ```
 
-> `1` is the `proposal-id`. On a testnet use its chain ID: `--chain-id worrell-testnet-1`
-> or `--chain-id worrell-testnet-2`.
+> `1` is the `proposal-id`. On a testnet use its chain ID: `--chain-id worrell-testnet-2`.
 
 ### 8.2 Query proposals
 

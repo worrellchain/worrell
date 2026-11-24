@@ -13,7 +13,7 @@
 | Data directory | `~/.worrell/` |
 | Address prefix | `worrell` (addresses `worrell1...`) |
 | Mainnet chain ID | `worrell-1` |
-| Testnet chain IDs | `worrell-testnet-1` (active), `worrell-testnet-2` (genesis ceremony) |
+| Testnet chain IDs | `worrell-testnet-2` (active), `worrell-testnet-1` (closed) |
 | License | Apache 2.0 |
 
 ---
@@ -89,7 +89,7 @@ Node state is stored in `~/.worrell/`.
 
 ```bash
 # Initialize the node for the testnet
-worrelld init <moniker> --chain-id worrell-testnet-1
+worrelld init <moniker> --chain-id worrell-testnet-2
 
 # Download the testnet genesis, configure peers and start:
 worrelld start
@@ -97,8 +97,8 @@ worrelld start
 
 Full guide to operating a node and creating a validator: [docs/RUNNING-A-NODE.md](docs/RUNNING-A-NODE.md).
 Genesis files, peers and per-network details: [worrellchain/networks](https://github.com/worrellchain/networks).
-To take part in the `worrell-testnet-2` genesis ceremony, see its
-[guide](https://github.com/worrellchain/networks/tree/main/worrell-testnet-2).
+The `worrell-testnet-2` [guide](https://github.com/worrellchain/networks/tree/main/worrell-testnet-2)
+has the network parameters, endpoints, faucet and the steps to join after the start.
 
 ---
 
@@ -173,7 +173,7 @@ Full detail: [docs/GOVERNANCE.md](docs/GOVERNANCE.md).
 | Max validators | 100 | 100 |
 | Min self-delegation | 1,000,000 uworrell (1 WORRELL) | 1,000,000 uworrell (1 WORRELL) |
 | Minimum commission | 5% (0.05) | 5% (0.05) |
-| Unbonding period | 1,814,400 s (21 days) | 3,600 s (1 hour) |
+| Unbonding period | 1,814,400 s (21 days) | 259,200 s (3 days) |
 | Max entries | 7 | 7 |
 | Historical entries | 10,000 | 10,000 |
 | Bond denom | uworrell | uworrell |
@@ -193,7 +193,7 @@ Full detail: [docs/GOVERNANCE.md](docs/GOVERNANCE.md).
 |-----------|---------|---------|
 | Signed blocks window | 10,000 blocks | 10,000 blocks |
 | Min signed per window | 5% (0.05) | 5% (0.05) |
-| Downtime jail duration | 43,200 s (12 hours) | 300 s (5 min) |
+| Downtime jail duration | 43,200 s (12 hours) | 43,200 s (12 hours) |
 
 ---
 
@@ -210,7 +210,7 @@ Full detail: [docs/GOVERNANCE.md](docs/GOVERNANCE.md).
 
 - **Validator announcements** (upgrades, governance, coordination): Telegram [t.me/worrellvalidators](https://t.me/worrellvalidators)
 - **Questions and support:** [GitHub Discussions](https://github.com/worrellchain/worrell/discussions) · hello@worrellchain.com
-- **Explorer (community-run by ANODE.TEAM):** [test.anode.team/worrell](https://test.anode.team/worrell)
+- **Explorers (worrell-testnet-2, community-run):** [xplr.crptcpchk.com/worrell-t2](https://xplr.crptcpchk.com/worrell-t2) (crptcpchk) · [explorer.bonynode.online/worrell-testnet-2](https://explorer.bonynode.online/worrell-testnet-2) (BonyNode)
 - **News:** [@worrellchain](https://x.com/worrellchain) on X · [worrellchain.com](https://worrellchain.com)
 
 ---
