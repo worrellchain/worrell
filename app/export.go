@@ -239,6 +239,12 @@ func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []str
 		panic(err)
 	}
 
+	// consensus key rotations (SDK v0.55) carry heights and times that must be
+	// reset for a genesis exported at height zero
+	if err := app.StakingKeeper.PrepareConsKeyRotationsForZeroHeightExport(ctx); err != nil {
+		panic(err)
+	}
+
 	/* Handle slashing state. */
 
 	// reset start height on signing infos
